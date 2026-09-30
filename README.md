@@ -1,39 +1,39 @@
-# FileSystem - Flight Reservations Manager
+# FileSystem - Gestor de Reservas de Vuelos
 
-A Java application developed for **Acceso a Datos (AAD)** that reads flight reservation data from a CSV file and organizes it into a hierarchical file system structure using Java NIO (`Files` and `Path`).
+Aplicación en Java desarrollada para el módulo de **Acceso a Datos (AAD)** que procesa información de reservas de vuelos desde un archivo CSV y las organiza en una estructura de carpetas y ficheros en el sistema de archivos utilizando Java NIO (`Files` y `Path`).
 
-## Features
+## Características
 
-- **CSV Parsing**: Reads and parses flight reservation records from `reservasAir.csv`.
-- **Data Modeling**: Maps raw records to structured domain models (`Reserva`, `Person`).
-- **File System Generation**: Automatically generates a `Destinos/` directory structure:
-  - Creates a dedicated folder for each destination airport code (e.g., `Destinos/MAD/`).
-  - Generates a formatted reservation summary file named after the flight number (e.g., `IB1234.txt`).
+- **Procesamiento de CSV**: Lectura y parseo del archivo de datos `reservasAir.csv`.
+- **Modelo de Dominio**: Mapeo de registros a objetos estructurados (`Reserva`, `Person`).
+- **Generación de Ficheros**: Creación automática del árbol de directorios `Destinos/`:
+  - Crea una carpeta por cada código de aeropuerto de destino (por ejemplo, `Destinos/MAD/`).
+  - Genera un archivo `.txt` con los datos detallados del vuelo y pasajero nombrado con el número de vuelo (por ejemplo, `IB1234.txt`).
 
-## Project Structure
+## Estructura del Proyecto
 
 ```
 ├── src/
-│   ├── Main.java              # Entry point: reads CSV and generates the destination folders/files
-│   ├── Person.java            # Model representing passenger information
-│   ├── Reserva.java           # Model representing flight reservation details
-│   └── ReservasMapper.java    # Utility mapper converting CSV tokens to Reserva objects
-├── reservasAir.csv            # Input dataset containing reservation records
-├── .gitignore                 # Configured to ignore IDE, build, and generated directories
+│   ├── Main.java              # Clase principal: lee el CSV y genera carpetas/archivos
+│   ├── Person.java            # Modelo que representa los datos del pasajero
+│   ├── Reserva.java           # Modelo que representa los detalles de la reserva de vuelo
+│   └── ReservasMapper.java    # Mapper de utilidad para convertir líneas de texto a Reserva
+├── reservasAir.csv            # Archivo de entrada con los registros de reservas
+├── .gitignore                 # Configurado para ignorar archivos del IDE, compilación y generados
 └── README.md
 ```
 
-## Requirements
+## Requisitos
 
-- **Java Development Kit (JDK)**: 17 or higher
-- **IDE**: IntelliJ IDEA (or any Java IDE)
+- **Java Development Kit (JDK)**: 17 o superior
+- **IDE**: IntelliJ IDEA (o cualquier IDE de Java compatible)
 
-## Getting Started
+## Instrucciones de Uso
 
-1. Clone the repository:
+1. Clona el repositorio:
    ```bash
    git clone https://github.com/xvi-r/FileSystem.git
    ```
-2. Open the project in IntelliJ IDEA.
-3. Run `Main.java`.
-4. The generated folders and flight ticket files will appear inside the `Destinos/` directory.
+2. Abre el proyecto en IntelliJ IDEA.
+3. Ejecuta la clase `Main.java`.
+4. Las carpetas organizadas por destino y los tickets de vuelo se generarán dentro del directorio `Destinos/`.
