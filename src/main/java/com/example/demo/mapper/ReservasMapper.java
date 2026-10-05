@@ -1,4 +1,7 @@
-package main.java.com.example.demo.toRefactor;
+package com.example.demo.mapper;
+
+import com.example.demo.model.Person;
+import com.example.demo.model.Reserva;
 
 final public class ReservasMapper {
 

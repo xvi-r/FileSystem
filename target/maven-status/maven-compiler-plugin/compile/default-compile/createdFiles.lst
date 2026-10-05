@@ -1,5 +1,6 @@
-main\java\com\example\demo\DemoApplication.class
-main\java\com\example\demo\toRefactor\ReservasMapper.class
-main\java\com\example\demo\toRefactor\Person.class
-main\java\com\example\demo\toRefactor\Reserva.class
-main\java\com\example\demo\toRefactor\Main.class
+com\example\demo\controller\FileController.class
+com\example\demo\DemoApplication.class
+com\example\demo\mapper\ReservasMapper.class
+com\example\demo\model\Person.class
+com\example\demo\model\Reserva.class
+com\example\demo\service\FileService.class

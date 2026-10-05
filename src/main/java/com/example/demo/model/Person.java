@@ -1,4 +1,4 @@
-package main.java.com.example.demo.toRefactor;
+package com.example.demo.model;
 
 public class Person {
     final private String nombre;

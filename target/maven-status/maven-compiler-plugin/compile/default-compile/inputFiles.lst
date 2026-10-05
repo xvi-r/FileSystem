@@ -1,5 +1,6 @@
+C:\intellij\Java\AAD\untitled\src\main\java\com\example\demo\controller\FileController.java
 C:\intellij\Java\AAD\untitled\src\main\java\com\example\demo\DemoApplication.java
-C:\intellij\Java\AAD\untitled\src\main\java\com\example\demo\toRefactor\Main.java
-C:\intellij\Java\AAD\untitled\src\main\java\com\example\demo\toRefactor\Person.java
-C:\intellij\Java\AAD\untitled\src\main\java\com\example\demo\toRefactor\Reserva.java
-C:\intellij\Java\AAD\untitled\src\main\java\com\example\demo\toRefactor\ReservasMapper.java
+C:\intellij\Java\AAD\untitled\src\main\java\com\example\demo\mapper\ReservasMapper.java
+C:\intellij\Java\AAD\untitled\src\main\java\com\example\demo\model\Person.java
+C:\intellij\Java\AAD\untitled\src\main\java\com\example\demo\model\Reserva.java
+C:\intellij\Java\AAD\untitled\src\main\java\com\example\demo\service\FileService.java
