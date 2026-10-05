@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 @Service
 public class CsvService {
-    ArrayList<Reserva> reservaList = new ArrayList<>();
+    private final ArrayList<Reserva> reservaList = new ArrayList<>();
 
     public String test() {
         return "Found " + reservaList.size();
