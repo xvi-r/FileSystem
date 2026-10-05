@@ -34,8 +34,8 @@ public class FileService {
             while ((line = reader.readLine()) != null) {
                reservaList.add( ReservasMapper.stringArrayToReserva(line.split(",")));
             }
-        } catch (IOException e ) {
-            System.out.println("IO Error" + e);
+        } catch (Exception e ) {
+            throw new RuntimeException(e);
         }
     }
 }
