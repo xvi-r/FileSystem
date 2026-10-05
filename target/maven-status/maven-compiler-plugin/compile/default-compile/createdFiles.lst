@@ -1,6 +1,0 @@
-com\example\demo\controller\FileController.class
-com\example\demo\DemoApplication.class
-com\example\demo\mapper\ReservasMapper.class
-com\example\demo\model\Person.class
-com\example\demo\model\Reserva.class
-com\example\demo\service\FileService.class

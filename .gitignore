@@ -1,22 +1,22 @@
-# Maven wrapper jar exception (prevents *.jar from blocking the wrapper)
 !.mvn/wrapper/maven-wrapper.jar
 
-# Environment and secret files
 .env
 .env.*
 
-# Local test / embedded databases (H2, SQLite, etc.)
 *.db
 *.sqlite
 *.sqlite3
 *.h2.db
 
-# Spring / Application logs directory
 logs/
 *.log.*
 
-# Local application properties (if you store local DB credentials/passwords)
 application-local.properties
 application-local.yml
 application-dev.properties
 application-dev.yml
+
+target/
+.idea/
+*.iml
+*.class
