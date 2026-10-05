@@ -1,3 +1,5 @@
+package main.java.com.example.demo.toRefactor;
+
 public class Person {
     final private String nombre;
     final private String email;

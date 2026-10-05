@@ -1,72 +1,22 @@
-# Compiled Java class files
-*.class
+# Maven wrapper jar exception (prevents *.jar from blocking the wrapper)
+!.mvn/wrapper/maven-wrapper.jar
 
-# Log files and crash dumps
-*.log
-hs_err_pid*
-replay_pid*
+# Environment and secret files
+.env
+.env.*
 
-# Package files
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+# Local test / embedded databases (H2, SQLite, etc.)
+*.db
+*.sqlite
+*.sqlite3
+*.h2.db
 
-# IntelliJ IDEA
-.idea/
-*.iml
-*.iws
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
+# Spring / Application logs directory
+logs/
+*.log.*
 
-# Eclipse
-.apt_generated/
-.apt_generated_test/
-.classpath
-.factorypath
-.project
-.settings/
-.springBeans
-.sts4-cache/
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-# NetBeans
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-# Visual Studio Code
-.vscode/
-
-# Build tools (Maven / Gradle)
-target/
-build/
-.gradle/
-
-# OS-generated files
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-
-# Windows
-Thumbs.db
-Thumbs.db:encryptable
-ehthumbs.db
-ehthumbs_vista.db
-[Dd]esktop.ini
-$RECYCLE.BIN/
-
-# Program generated output
-Destinos/
-reservas.txt
+# Local application properties (if you store local DB credentials/passwords)
+application-local.properties
+application-local.yml
+application-dev.properties
+application-dev.yml

@@ -1,3 +1,5 @@
+package main.java.com.example.demo.toRefactor;
+
 public class Reserva {
     final private String destino;
     final private String origin;

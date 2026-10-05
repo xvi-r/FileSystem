@@ -1,3 +1,5 @@
+package main.java.com.example.demo.toRefactor;
+
 final public class ReservasMapper {
 
     public static Reserva stringArrayToReserva(String[] array) {
