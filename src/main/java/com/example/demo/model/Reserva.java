@@ -61,13 +61,17 @@ public class Reserva {
     }
 
 
-    public String getCsvString() {
+    public String getCsv() {
         return String.format(
-                "%d,%s,%s,%s",
-                identifier,
+                "%s,%s,%s,%s,%s,%d,%s,%s",
                 destino,
                 origin,
-                flightNumber
+                flightNumber,
+                passenger.getNombre(),
+                passenger.getEmail(),
+                passenger.getEdad(),
+                passenger.getDocumento(),
+                passenger.getAsiento()
         );
     }
 
