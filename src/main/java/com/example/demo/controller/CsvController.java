@@ -29,9 +29,15 @@ public class CsvController {
     //accepta MULTIPART_FORM_DATA_VALUE para los ficheros
     @PostMapping(value = "/upload-csv", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     //RequestParam("file") para poner el file en el argumento
-        public ResponseEntity<String> uploadCsv(@RequestParam("file") MultipartFile file) throws IOException {
-            csvService.storeCsv(file);
-            return ResponseEntity.ok("Reserva Uploaded Succesfully");
-        }
+    public ResponseEntity<String> uploadCsv(@RequestParam("file") MultipartFile file) throws IOException {
+        csvService.storeCsv(file);
+        return ResponseEntity.ok("Reserva Uploaded Succesfully");
+    }
+
+    @GetMapping("/process-csvç")
+    public ResponseEntity<String> processCsv() throws IOException {
+        csvService.processCsv();
+        return ResponseEntity.ok("Csv successfully processed");
+    }
 
 }
