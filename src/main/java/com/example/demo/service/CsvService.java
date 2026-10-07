@@ -90,6 +90,15 @@ public class CsvService {
                 } catch (FileAlreadyExistsException e) {
                     System.out.println("Skipping");
                 }
+
+                Files.writeString(file,writeCsv(reserva) );
+
             }
+    }
+
+    private String writeCsv(Reserva reserva) {
+        Reserva.setIdentifier(Reserva.getIdentifier() + 1);
+        return  "identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n" +
+                reserva.getCsv();
     }
 }
