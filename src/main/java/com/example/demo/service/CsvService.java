@@ -12,11 +12,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
+import java.time.LocalDate;
+import java.time.Year;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CsvService {
@@ -42,14 +42,54 @@ public class CsvService {
     }
 
     public void storeCsv(MultipartFile file) throws IOException {
-        Path uploadDirectory = Paths.get("uploads/baseCsv");
+        Path uploadDirectory = Paths.get("uploads", "baseCSV");
 
-        Path filePath = uploadDirectory.resolve(file.getOriginalFilename());
+        Path filePath = uploadDirectory.resolve("uploadedCSV");
 
         Files.copy(
                 file.getInputStream(),
                 filePath,
                 StandardCopyOption.REPLACE_EXISTING
         );
+    }
+
+    public void processCsv() throws IOException {
+        Path directory = Path.of("uploads/reservas");
+        Path uploadedFileDirectory = Path.of("uploads", "baseCSV", "uploadedCSV");
+
+        try (BufferedReader reader = Files.newBufferedReader(uploadedFileDirectory)) {
+            String line = reader.readLine();
+
+            while ((line = reader.readLine()) != null) {
+                reservaList.add(ReservasMapper.stringArrayToReserva(line.split(",")));
+            }
+        }
+
+        for (Reserva reserva : reservaList) {
+            List<Path> fold = Files.list(directory).toList();
+
+            Path destinoFolder = Path.of("uploads", "reservas", reserva.getDestino());
+            Files.createDirectories(destinoFolder);
+
+            LocalDate today = LocalDate.now();
+
+            int year = today.getYear();
+            String month = String.format("%02d", today.getMonthValue());
+            String day = String.format("%02d", today.getDayOfMonth());
+
+            String destinationCountryCode = reserva.getDestino();
+
+                // Construir el nombre del fichero según el requisito: AirTortilla_XX_YYYY_MM_DD
+                String fileName = String.format("AirTortilla_%s_%d_%s_%s.csv",
+                        destinationCountryCode, year, month, day);
+
+                Path file = destinoFolder.resolve(fileName);
+
+                try {
+                    Files.createFile(file);
+                } catch (FileAlreadyExistsException e) {
+                    System.out.println("Skipping");
+                }
+            }
     }
 }
