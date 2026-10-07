@@ -20,6 +20,10 @@ public class Reserva {
         Reserva.identifier = identifier;
     }
 
+    public static int getIdentifier() {
+        return identifier;
+    }
+
     @Override
     public String toString() {
         return "Reserva{" +
