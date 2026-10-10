@@ -34,9 +34,9 @@ public class CsvService {
             String line = reader.readLine();
 
             while ((line = reader.readLine()) != null) {
-               reservaList.add( ReservasMapper.stringArrayToReserva(line.split(",")));
+                reservaList.add(ReservasMapper.stringArrayToReserva(line.split(",")));
             }
-        } catch (Exception e ) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -45,6 +45,8 @@ public class CsvService {
         Path uploadDirectory = Paths.get("uploads", "baseCSV");
 
         Path filePath = uploadDirectory.resolve("uploadedCSV");
+        System.out.println("Resolved path: " + filePath.toAbsolutePath());
+        System.out.println("Exists: " + Files.exists(filePath));
 
         Files.copy(
                 file.getInputStream(),
@@ -79,26 +81,34 @@ public class CsvService {
 
             String destinationCountryCode = reserva.getDestino();
 
-                // Construir el nombre del fichero según el requisito: AirTortilla_XX_YYYY_MM_DD
-                String fileName = String.format("AirTortilla_%s_%d_%s_%s.csv",
-                        destinationCountryCode, year, month, day);
+            // Construir el nombre del fichero según el requisito: AirTortilla_XX_YYYY_MM_DD
+            String fileName = String.format("AirTortilla_%s_%d_%s_%s.csv",
+                    destinationCountryCode, year, month, day);
 
-                Path file = destinoFolder.resolve(fileName);
+            Path file = destinoFolder.resolve(fileName);
 
+            if (Files.exists(file)) {
+                System.out.println("entered");
+                Reserva.setIdentifier(Reserva.getIdentifier() + 1);
+                Files.write(
+                        file,
+                        (reserva.getCsv() + "\n").getBytes(),
+                        StandardOpenOption.APPEND
+                );
+            } else {
                 try {
                     Files.createFile(file);
+                    Files.writeString(file, writeCsv(reserva));
                 } catch (FileAlreadyExistsException e) {
-                    System.out.println("Skipping");
+                    System.out.println("appending");
                 }
-
-                Files.writeString(file,writeCsv(reserva) );
-
             }
+        }
     }
 
     private String writeCsv(Reserva reserva) {
         Reserva.setIdentifier(Reserva.getIdentifier() + 1);
-        return  "identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n" +
+        return "identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n" +
                 reserva.getCsv();
     }
 }
