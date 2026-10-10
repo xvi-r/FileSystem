@@ -92,7 +92,7 @@ public class CsvService {
                 Reserva.setIdentifier(Reserva.getIdentifier() + 1);
                 Files.write(
                         file,
-                        (reserva.getCsv() + "\n").getBytes(),
+                        reserva.getCsv().getBytes(),
                         StandardOpenOption.APPEND
                 );
             } else {
