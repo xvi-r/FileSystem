@@ -67,8 +67,8 @@ public class Reserva {
 
     public String getCsv() {
         return String.format(
-                "%d,%s,%s,%s,%s,%s,%d,%s,%s\n",
-                Reserva.identifier,
+                "%s,%s,%s,%s,%s,%s,%d,%s,%s\n",
+                "AT-00" + Reserva.identifier,
                 destino,
                 origin,
                 flightNumber,
