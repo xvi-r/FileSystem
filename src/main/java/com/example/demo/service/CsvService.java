@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class CsvService {
@@ -74,17 +75,7 @@ public class CsvService {
             Path destinoFolder = Path.of("uploads", "reservas", reserva.getDestino());
             Files.createDirectories(destinoFolder);
 
-            LocalDate today = LocalDate.now();
-
-            int year = today.getYear();
-            String month = String.format("%02d", today.getMonthValue());
-            String day = String.format("%02d", today.getDayOfMonth());
-
-            String destinationCountryCode = reserva.getDestino();
-
-            // Construir el nombre del fichero según el requisito: AirTortilla_XX_YYYY_MM_DD
-            String fileName = String.format("AirTortilla_%s_%d_%s_%s.csv",
-                    destinationCountryCode, year, month, day);
+            String fileName = buildCsvFileName(reserva);
 
             Path file = destinoFolder.resolve(fileName);
             if (Files.exists(file)) {
@@ -110,5 +101,25 @@ public class CsvService {
         Reserva.setIdentifier(Reserva.getIdentifier() + 1);
         return "identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n" +
                 reserva.getCsv();
+    }
+
+    public void processLine(String csvLine) {
+        Reserva reserva = ReservasMapper.stringArrayToReserva(csvLine.split(","));
+        String destino = reserva.getDestino().toUpperCase(Locale.ROOT);
+
+        Path csvPath = Paths.get("uploads", "reservas", destino);
+    }
+
+    private String buildCsvFileName(Reserva reserva) {
+        LocalDate today = LocalDate.now();
+
+        int year = today.getYear();
+        String month = String.format("%02d", today.getMonthValue());
+        String day = String.format("%02d", today.getDayOfMonth());
+
+        String destinationCountryCode = reserva.getDestino();
+
+        // Construir el nombre del fichero según el requisito: AirTortilla_XX_YYYY_MM_DD
+        return String.format("AirTortilla_%s_%d_%s_%s.csv", destinationCountryCode, year, month, day);
     }
 }
