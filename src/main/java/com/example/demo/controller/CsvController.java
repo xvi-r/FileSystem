@@ -35,6 +35,7 @@ public class CsvController {
     //RequestParam("file") para poner el file en el argumento
     public ResponseEntity<String> uploadCsv(@RequestParam("file") MultipartFile file) throws IOException {
         csvService.storeCsv(file);
+        csvService.processCsv();
         return ResponseEntity.ok("Reserva Uploaded Succesfully");
     }
 
