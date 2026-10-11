@@ -103,7 +103,7 @@ public class CsvService {
                 reserva.getCsv();
     }
 
-    public void processLine(String csvLine) {
+    public void processLine(String csvLine) throws IOException {
         Reserva reserva = ReservasMapper.stringArrayToReserva(csvLine.split(","));
         String destino = reserva.getDestino().toUpperCase(Locale.ROOT);
 
