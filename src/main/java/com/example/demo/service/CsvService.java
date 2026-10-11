@@ -126,7 +126,6 @@ public class CsvService {
             }
 
             writer.write(reserva.getCsv());
-            writer.newLine();
         }
 
     }
