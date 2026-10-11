@@ -53,4 +53,16 @@ public class CsvController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"AirTortilla.zip\"")
                 .body(zipService.createZip());
     }
+
+    @PostMapping(
+            value = "/line",
+            consumes = "text/csv"
+    )
+    //@RequestBody coge el body entero y lo pasa como parametro, el body en si solo deberia ser una linea de csv
+    public ResponseEntity<Void> uploadLine(@RequestBody String csv) throws IOException {
+
+        csvService.processLine(csv);
+
+        return ResponseEntity.ok().build();
+    }
 }
