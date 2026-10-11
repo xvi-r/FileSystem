@@ -121,8 +121,7 @@ public class CsvService {
                 StandardOpenOption.APPEND)) {
 
             if (!fileExists) {
-                writer.write("Booking ID,Destination,Origin,Passenger Name,Booking Date");
-                writer.newLine();
+                writer.write("identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n");
             }
 
             writer.write(reserva.getCsv());
