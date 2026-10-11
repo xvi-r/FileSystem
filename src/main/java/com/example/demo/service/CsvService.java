@@ -56,6 +56,7 @@ public class CsvService {
     }
 
     public void processCsv() throws IOException {
+        System.out.println("ENTERED");
         Path directory = Path.of("uploads/reservas");
         Path uploadedFileDirectory = Path.of("uploads", "baseCSV", "uploadedCSV");
 
@@ -86,7 +87,6 @@ public class CsvService {
                     destinationCountryCode, year, month, day);
 
             Path file = destinoFolder.resolve(fileName);
-
             if (Files.exists(file)) {
                 System.out.println("entered");
                 Reserva.setIdentifier(Reserva.getIdentifier() + 1);
