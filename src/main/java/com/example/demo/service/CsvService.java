@@ -124,6 +124,7 @@ public class CsvService {
                 writer.write("identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n");
             }
 
+            Reserva.setIdentifier(Reserva.getIdentifier() + 1);
             writer.write(reserva.getCsv());
         }
 
