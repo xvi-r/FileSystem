@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AirTortilla — Gestión y Consulta de Reservas en Lote</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Librería JSZip local para leer y descomprimir el archivo ZIP retornado por el backend -->
+  <script src="jszip.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Barra superior de navegación / Encabezado -->
+    <header class="app-header">
+      <div class="header-branding">
+        <div class="brand-symbol">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">AIRTORTILLA</div>
+          <div class="brand-subtitle">Operaciones de Vuelo &bull; Motor de Procesamiento por Lotes</div>
+        </div>
+      </div>
+
+      <div class="header-meta">
+        <div class="meta-item">
+          <span class="meta-label">ENTORNO</span>
+          <span class="meta-value">OPERACIONES INTERNAS</span>
+        </div>
+        <div class="meta-divider" aria-hidden="true"></div>
+        <div class="meta-item">
+          <span class="meta-label">PASARELA</span>
+          <span class="meta-value meta-mono">/files/*</span>
+        </div>
+        <div class="meta-divider" aria-hidden="true"></div>
+        <div class="system-indicator" id="system-indicator">
+          <span class="status-dot"></span>
+          <span class="status-label" id="system-status-text">SISTEMA ACTIVO</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Subencabezado / Contexto Operativo -->
+    <div class="context-banner">
+      <div class="context-info">
+        <span class="context-tag">MODO LOTE ÚNICAMENTE</span>
+        <span class="context-desc">Partición de reservas por país de destino &bull; Formato de salida: <code class="code-pill">AirTortilla_XX_YYYY_MM_DD.csv</code></span>
+      </div>
+      <div class="context-timestamp" id="session-timestamp">UTC ACTIVO</div>
+    </div>
+
+    <!-- Área Principal de Trabajo -->
+    <main class="main-content">
+      <!-- Rejilla de Operaciones -->
+      <div class="panels-grid">
+
+        <!-- ================= PANEL 1: CARGA DE CSV EN LOTE ================= -->
+        <section class="ops-panel" id="panel-upload" aria-labelledby="upload-heading">
+          <div class="panel-header">
+            <div class="panel-badge">01</div>
+            <div class="panel-headings">
+              <h2 id="upload-heading" class="panel-title">Carga de CSV en Lote</h2>
+              <p class="panel-subtitle">Subir archivo de reservas para su partición por país de destino</p>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <!-- Zona de Carga / Selector de Archivos -->
+            <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Seleccionar archivo CSV para subir">
+              <input type="file" id="file-input" accept=".csv,text/csv" class="file-input-hidden" aria-hidden="true">
+              <div class="drop-zone-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <div class="drop-zone-prompt">
+                <span class="prompt-main">Haga clic para seleccionar archivo CSV <span class="prompt-alt">o arrástrelo y suéltelo aquí</span></span>
+                <span class="prompt-sub">Formato admitido: reservas delimitadas por comas (<span class="mono-text">.csv</span>)</span>
+              </div>
+            </div>
+
+            <!-- Información del Archivo Seleccionado -->
+            <div class="file-summary" id="file-summary" style="display: none;" aria-live="polite">
+              <div class="file-summary-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+              </div>
+              <div class="file-summary-meta">
+                <span class="file-name" id="selected-file-name">—</span>
+                <span class="file-size" id="selected-file-size">—</span>
+              </div>
+              <button type="button" class="btn-clear-file" id="btn-clear-file" title="Quitar archivo seleccionado" aria-label="Quitar archivo seleccionado">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Botón de Subida -->
+            <div class="action-block">
+              <button type="button" class="btn btn-primary" id="btn-upload" disabled>
+                <span class="btn-spinner" id="upload-spinner" aria-hidden="true"></span>
+                <span class="btn-icon" id="upload-btn-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                </span>
+                <span class="btn-text" id="upload-btn-text">Subir Archivo CSV en Lote</span>
+              </button>
+            </div>
+
+            <!-- Formato Requerido por el Backend -->
+            <div class="schema-spec-box">
+              <div class="spec-header-row">
+                <span class="spec-label">CABECERA CSV OBLIGATORIA (8 COLUMNAS)</span>
+                <span class="spec-tag mono-text">ESTRICTO</span>
+              </div>
+              <div class="schema-code-block mono-text">destino,origin,flightNumber,nombre,edad,documento,asiento,email</div>
+              <div class="schema-hint">
+                El archivo debe comenzar obligatoriamente con esta cabecera para que el backend pueda asociar la edad numérica y los datos de cada pasajero.
+              </div>
+            </div>
+
+            <!-- Especificación del Endpoint -->
+            <div class="endpoint-specs">
+              <span class="spec-label">ENDPOINT DESTINO</span>
+              <div class="spec-value mono-text"><span class="http-badge post">POST</span> /files/upload-csv &bull; multipart/form-data ("file")</div>
+            </div>
+
+            <!-- Mensaje de Respuesta / Estado -->
+            <div class="feedback-banner" id="upload-feedback" style="display: none;" role="status" aria-live="polite">
+              <div class="feedback-icon" id="upload-feedback-icon"></div>
+              <div class="feedback-content">
+                <div class="feedback-title" id="upload-feedback-title">Estado</div>
+                <div class="feedback-message" id="upload-feedback-msg">—</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= PANEL 2: CONSULTOR EN LOTE Y DESCARGA ZIP ================= -->
+        <section class="ops-panel" id="panel-consult" aria-labelledby="consult-heading">
+          <div class="panel-header">
+            <div class="panel-badge">02</div>
+            <div class="panel-headings">
+              <h2 id="consult-heading" class="panel-title">Consultor en Lote y Recuperación de Archivo</h2>
+              <p class="panel-subtitle">Consultar las reservas particionadas directamente en pantalla y descargar el ZIP</p>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <!-- Cuadro de Información Técnica -->
+            <div class="consult-info-box">
+              <div class="info-row">
+                <div class="info-cell">
+                  <span class="info-label">ENDPOINT DESTINO</span>
+                  <span class="info-val mono-text"><span class="http-badge get">GET</span> /files/zip</span>
+                </div>
+                <div class="info-cell">
+                  <span class="info-label">TIPO DE CONTENIDO</span>
+                  <span class="info-val mono-text">application/zip (binario)</span>
+                </div>
+              </div>
+              <div class="info-row border-top">
+                <div class="info-cell full-width">
+                  <span class="info-label">REPOSITORIO DE DESTINOS</span>
+                  <span class="info-val mono-text">uploads/reservas/{pais}/AirTortilla_{XX}_{YYYY}_{MM}_{DD}.csv</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="consult-description">
+              Solicita el archivo ZIP al backend, procesa las particiones generadas y muestra cada archivo en tablas interactivas. También permite descargar el paquete comprimido original.
+            </p>
+
+            <!-- Acciones de Consulta y Descarga -->
+            <div class="actions-split">
+              <button type="button" class="btn btn-secondary" id="btn-consult">
+                <span class="btn-spinner" id="consult-spinner" aria-hidden="true"></span>
+                <span class="btn-icon" id="consult-btn-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                </span>
+                <span class="btn-text" id="consult-btn-text">Consultar Resultados en Lote</span>
+              </button>
+
+              <button type="button" class="btn btn-outline" id="btn-download-zip" disabled title="Descargar archivo ZIP binario devuelto por el servidor">
+                <span class="btn-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                </span>
+                <span class="btn-text">Descargar ZIP</span>
+              </button>
+            </div>
+
+            <!-- Mensaje de Estado / Feedback de Consulta -->
+            <div class="feedback-banner" id="consult-feedback" style="display: none;" role="status" aria-live="polite">
+              <div class="feedback-icon" id="consult-feedback-icon"></div>
+              <div class="feedback-content">
+                <div class="feedback-title" id="consult-feedback-title">Estado</div>
+                <div class="feedback-message" id="consult-feedback-msg">—</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ================= SECCIÓN DE VISUALIZACIÓN EN PANTALLA ================= -->
+      <section class="viewer-section" id="viewer-section" aria-labelledby="viewer-heading">
+        <div class="viewer-header">
+          <div class="viewer-title-group">
+            <h3 id="viewer-heading" class="viewer-title">Tabla de Consulta de Resultados en Lote</h3>
+            <span class="viewer-badge" id="viewer-badge">SIN CONSULTAS REALIZADAS</span>
+          </div>
+          <div class="viewer-controls" id="viewer-controls" style="display: none;">
+            <!-- Filtro por Archivo de Destino -->
+            <div class="control-group">
+              <label for="file-filter-select" class="control-label">FILTRAR POR ARCHIVO:</label>
+              <select id="file-filter-select" class="control-select">
+                <option value="ALL">Todos los Archivos Particionados</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenedor de Tablas Dinámicas -->
+        <div class="viewer-body" id="viewer-body">
+          <div class="viewer-empty-state" id="viewer-empty-state">
+            <div class="empty-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="8" y1="13" x2="16" y2="13"/>
+                <line x1="8" y1="17" x2="16" y2="17"/>
+              </svg>
+            </div>
+            <div class="empty-text">No hay datos de consulta cargados</div>
+            <div class="empty-subtext">Haga clic en "Consultar Resultados en Lote" para consultar el servidor y visualizar las reservas particionadas.</div>
+          </div>
+
+          <!-- Contenedor donde se insertan las tablas separadas por nombre de archivo -->
+          <div class="tables-container" id="tables-container" style="display: none;"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Pie de Página -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span>AirTortilla Enterprise &bull; Plataforma de Reservas</span>
+        <span class="footer-bullet">&bull;</span>
+        <span>Versión 1.0.0</span>
+      </div>
+      <div class="footer-right">
+        <span>Acceso Restringido &bull; Personal de Operaciones y Despacho Únicamente</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
