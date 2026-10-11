@@ -51,5 +51,14 @@ public class Person {
         return documento;
     }
 
-
+    public String getCsvString() {
+        return String.format(
+                "%s,%s,%d,%s,%s",
+                nombre,
+                email,
+                edad,
+                documento,
+                asiento
+        );
+    }
 }

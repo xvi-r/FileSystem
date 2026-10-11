@@ -1,6 +1,9 @@
 package com.example.demo.model;
 
 public class Reserva {
+
+    private static int identifier = 0;
+
     final private String destino;
     final private String origin;
     private String flightNumber;
@@ -11,6 +14,14 @@ public class Reserva {
         this.origin = origin;
         this.flightNumber = flightNumber;
         this.passenger = passenger;
+    }
+
+    public static void setIdentifier(int identifier) {
+        Reserva.identifier = identifier;
+    }
+
+    public static int getIdentifier() {
+        return identifier;
     }
 
     @Override
@@ -53,32 +64,19 @@ public class Reserva {
         this.passenger = passenger;
     }
 
-    public String toFileString() {
-        return String.format("""
-            ==============================
-            RESERVA DE VUELO
-            ==============================
-            Destination : %s
-            Origin      : %s
-            Flight      : %s
 
-            PASAJERO
-            ------------------------------
-            Name        : %s
-            Age         : %d
-            Document    : %s
-            Seat        : %s
-            Email       : %s
-            ==============================
-            """,
+    public String getCsv() {
+        return String.format(
+                "%s,%s,%s,%s,%s,%s,%d,%s,%s\n",
+                "AT-00" + Reserva.identifier,
                 destino,
                 origin,
                 flightNumber,
                 passenger.getNombre(),
+                passenger.getEmail(),
                 passenger.getEdad(),
                 passenger.getDocumento(),
-                passenger.getAsiento(),
-                passenger.getEmail()
+                passenger.getAsiento()
         );
     }
 

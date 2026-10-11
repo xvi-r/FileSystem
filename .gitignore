@@ -7,6 +7,7 @@
 *.sqlite
 *.sqlite3
 *.h2.db
+/uploads/
 
 logs/
 *.log.*
@@ -20,3 +21,5 @@ target/
 .idea/
 *.iml
 *.class
+
+/src/main/java/com/example/demo/Playground.java
