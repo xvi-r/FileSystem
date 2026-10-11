@@ -70,7 +70,6 @@ public class CsvService {
         }
 
         for (Reserva reserva : reservaList) {
-            List<Path> fold = Files.list(directory).toList();
 
             Path destinoFolder = Path.of("uploads", "reservas", reserva.getDestino());
             Files.createDirectories(destinoFolder);
