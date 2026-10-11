@@ -107,7 +107,28 @@ public class CsvService {
         Reserva reserva = ReservasMapper.stringArrayToReserva(csvLine.split(","));
         String destino = reserva.getDestino().toUpperCase(Locale.ROOT);
 
-        Path csvPath = Paths.get("uploads", "reservas", destino);
+        Path directory = Paths.get("uploads", "reservas", destino);
+        Files.createDirectories(directory);
+
+        Path csvPath = directory.resolve(buildCsvFileName(reserva));
+
+        boolean fileExists = Files.exists(csvPath);
+
+        //Usando CREATE se crea el fichero si no existe
+        try (BufferedWriter writer = Files.newBufferedWriter(
+                csvPath,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.APPEND)) {
+
+            if (!fileExists) {
+                writer.write("Booking ID,Destination,Origin,Passenger Name,Booking Date");
+                writer.newLine();
+            }
+
+            writer.write(reserva.getCsv());
+            writer.newLine();
+        }
+
     }
 
     private String buildCsvFileName(Reserva reserva) {
