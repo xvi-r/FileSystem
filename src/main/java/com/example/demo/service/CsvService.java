@@ -9,6 +9,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -77,22 +78,22 @@ public class CsvService {
             String fileName = buildCsvFileName(reserva);
 
             Path file = destinoFolder.resolve(fileName);
-            if (Files.exists(file)) {
-                System.out.println("entered");
-                Reserva.setIdentifier(Reserva.getIdentifier() + 1);
-                Files.write(
-                        file,
-                        reserva.getCsv().getBytes(),
-                        StandardOpenOption.APPEND
-                );
-            } else {
-                try {
-                    Files.createFile(file);
-                    Files.writeString(file, writeCsv(reserva));
-                } catch (FileAlreadyExistsException e) {
-                    System.out.println("appending");
+
+            boolean fileExists = Files.exists(file);
+
+            try (BufferedWriter writer = Files.newBufferedWriter(
+                    file,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND)) {
+
+                if(!fileExists) {
+                    writer.write("identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n");
                 }
+
+                Reserva.setIdentifier(Reserva.getIdentifier() + 1);
+                writer.write(reserva.getCsv());
             }
+
         }
     }
 
