@@ -109,8 +109,23 @@
               </button>
             </div>
 
-            <!-- Botón de Subida -->
-            <div class="action-block">
+            <!-- Selector de Modalidad de Carga -->
+            <div class="upload-mode-selector" id="upload-mode-selector">
+              <span class="mode-label">MODALIDAD DE SUBIDA:</span>
+              <div class="mode-pills" role="radiogroup" aria-label="Modalidad de Subida">
+                <button type="button" class="mode-pill active" id="pill-mode-batch" role="radio" aria-checked="true">
+                  <span class="mode-pill-dot"></span>
+                  Lote Completo (POST /files/upload-csv)
+                </button>
+                <button type="button" class="mode-pill" id="pill-mode-line" role="radio" aria-checked="false">
+                  <span class="mode-pill-dot"></span>
+                  Línea a Línea (POST /files/line)
+                </button>
+              </div>
+            </div>
+
+            <!-- Botón de Subida en Lote (Modo Lote) -->
+            <div class="action-block" id="action-batch-block">
               <button type="button" class="btn btn-primary" id="btn-upload" disabled>
                 <span class="btn-spinner" id="upload-spinner" aria-hidden="true"></span>
                 <span class="btn-icon" id="upload-btn-icon">
@@ -121,6 +136,86 @@
                 </span>
                 <span class="btn-text" id="upload-btn-text">Subir Archivo CSV en Lote</span>
               </button>
+            </div>
+
+            <!-- Controles y Vista de Subida Línea a Línea (Modo Línea a Línea) -->
+            <div class="line-stepper-box" id="line-stepper-box" style="display: none;">
+              <div class="stepper-header">
+                <div class="stepper-title-wrap">
+                  <span class="stepper-title">PROCESAMIENTO LÍNEA A LÍNEA</span>
+                  <span class="stepper-counter" id="line-counter">Línea 0 de 0</span>
+                </div>
+                <div class="stepper-status-pill" id="line-status-pill">ESPERANDO INICIO</div>
+              </div>
+
+              <!-- Vista previa de la línea CSV actual -->
+              <div class="current-line-preview">
+                <div class="preview-label">LÍNEA CSV ACTUAL (BODY TEXT/CSV):</div>
+                <div class="preview-code mono-text" id="current-line-raw">—</div>
+              </div>
+
+              <!-- Ficha con datos parseados de la reserva actual -->
+              <div class="line-fields-grid" id="line-fields-grid">
+                <div class="line-field">
+                  <span class="field-k">DESTINO</span>
+                  <span class="field-v mono-text" id="field-destino">—</span>
+                </div>
+                <div class="line-field">
+                  <span class="field-k">ORIGEN</span>
+                  <span class="field-v mono-text" id="field-origin">—</span>
+                </div>
+                <div class="line-field">
+                  <span class="field-k">VUELO</span>
+                  <span class="field-v mono-text" id="field-flight">—</span>
+                </div>
+                <div class="line-field">
+                  <span class="field-k">PASAJERO</span>
+                  <span class="field-v" id="field-nombre">—</span>
+                </div>
+                <div class="line-field">
+                  <span class="field-k">EDAD</span>
+                  <span class="field-v mono-text" id="field-edad">—</span>
+                </div>
+                <div class="line-field">
+                  <span class="field-k">DOCUMENTO</span>
+                  <span class="field-v mono-text" id="field-documento">—</span>
+                </div>
+                <div class="line-field">
+                  <span class="field-k">ASIENTO</span>
+                  <span class="field-v mono-text" id="field-asiento">—</span>
+                </div>
+                <div class="line-field">
+                  <span class="field-k">EMAIL</span>
+                  <span class="field-v mono-text" id="field-email">—</span>
+                </div>
+              </div>
+
+              <!-- Botones de Acción Línea a Línea -->
+              <div class="stepper-actions">
+                <button type="button" class="btn btn-primary btn-step" id="btn-send-line" disabled>
+                  <span class="btn-spinner" id="step-spinner" aria-hidden="true"></span>
+                  <span class="btn-icon" id="step-btn-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                  </span>
+                  <span class="btn-text" id="step-btn-text">Enviar y Siguiente Línea</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="btn-reset-line-stepper" disabled>
+                  Reiniciar
+                </button>
+              </div>
+
+              <!-- Registro de líneas procesadas con checkmarks -->
+              <div class="line-log-container">
+                <div class="log-header">
+                  <span>HISTORIAL DE ENVÍOS LÍNEA A LÍNEA</span>
+                  <span id="log-count">0 procesadas</span>
+                </div>
+                <ul class="line-log-list" id="line-log-list">
+                  <li class="log-empty">No se ha enviado ninguna línea todavía.</li>
+                </ul>
+              </div>
             </div>
 
             <!-- Formato Requerido por el Backend -->
@@ -136,9 +231,9 @@
             </div>
 
             <!-- Especificación del Endpoint -->
-            <div class="endpoint-specs">
-              <span class="spec-label">ENDPOINT DESTINO</span>
-              <div class="spec-value mono-text"><span class="http-badge post">POST</span> /files/upload-csv &bull; multipart/form-data ("file")</div>
+            <div class="endpoint-specs" id="endpoint-specs-box">
+              <span class="spec-label" id="spec-endpoint-label">ENDPOINT DESTINO (LOTE)</span>
+              <div class="spec-value mono-text" id="spec-endpoint-val"><span class="http-badge post">POST</span> /files/upload-csv &bull; multipart/form-data ("file")</div>
             </div>
 
             <!-- Mensaje de Respuesta / Estado -->
@@ -153,64 +248,184 @@
         </section>
 
 
-        <!-- ================= PANEL 2: CONSULTOR EN LOTE Y DESCARGA ZIP ================= -->
+        <!-- ================= PANEL 2: CONSULTOR DE RESERVAS (LOTE O LÍNEA A LÍNEA) ================= -->
         <section class="ops-panel" id="panel-consult" aria-labelledby="consult-heading">
           <div class="panel-header">
             <div class="panel-badge">02</div>
             <div class="panel-headings">
-              <h2 id="consult-heading" class="panel-title">Consultor en Lote y Recuperación de Archivo</h2>
-              <p class="panel-subtitle">Consultar las reservas particionadas directamente en pantalla y descargar el ZIP</p>
+              <h2 id="consult-heading" class="panel-title">Consultor de Reservas y Recuperación</h2>
+              <p class="panel-subtitle">Consultar reservas particionadas en lote o paso a paso línea a línea</p>
             </div>
           </div>
 
           <div class="panel-body">
-            <!-- Cuadro de Información Técnica -->
-            <div class="consult-info-box">
-              <div class="info-row">
-                <div class="info-cell">
-                  <span class="info-label">ENDPOINT DESTINO</span>
-                  <span class="info-val mono-text"><span class="http-badge get">GET</span> /files/zip</span>
+            <!-- Selector de Modalidad de Consulta -->
+            <div class="upload-mode-selector" id="consult-mode-selector">
+              <span class="mode-label">MODALIDAD DE CONSULTA:</span>
+              <div class="mode-pills" role="radiogroup" aria-label="Modalidad de Consulta">
+                <button type="button" class="mode-pill active" id="pill-consult-batch" role="radio" aria-checked="true">
+                  <span class="mode-pill-dot"></span>
+                  Lote Completo (GET /files/zip)
+                </button>
+                <button type="button" class="mode-pill" id="pill-consult-line" role="radio" aria-checked="false">
+                  <span class="mode-pill-dot"></span>
+                  Línea a Línea (GET /files/consult/line)
+                </button>
+              </div>
+            </div>
+
+            <!-- CONTENIDO CONSULTA EN LOTE (BATCH) -->
+            <div id="consult-batch-content">
+              <!-- Cuadro de Información Técnica -->
+              <div class="consult-info-box">
+                <div class="info-row">
+                  <div class="info-cell">
+                    <span class="info-label">ENDPOINT DESTINO</span>
+                    <span class="info-val mono-text"><span class="http-badge get">GET</span> /files/zip</span>
+                  </div>
+                  <div class="info-cell">
+                    <span class="info-label">TIPO DE CONTENIDO</span>
+                    <span class="info-val mono-text">application/zip (binario)</span>
+                  </div>
                 </div>
-                <div class="info-cell">
-                  <span class="info-label">TIPO DE CONTENIDO</span>
-                  <span class="info-val mono-text">application/zip (binario)</span>
+                <div class="info-row border-top">
+                  <div class="info-cell full-width">
+                    <span class="info-label">REPOSITORIO DE DESTINOS</span>
+                    <span class="info-val mono-text">uploads/reservas/{pais}/AirTortilla_{XX}_{YYYY}_{MM}_{DD}.csv</span>
+                  </div>
                 </div>
               </div>
-              <div class="info-row border-top">
-                <div class="info-cell full-width">
-                  <span class="info-label">REPOSITORIO DE DESTINOS</span>
-                  <span class="info-val mono-text">uploads/reservas/{pais}/AirTortilla_{XX}_{YYYY}_{MM}_{DD}.csv</span>
+
+              <p class="consult-description">
+                Solicita el archivo ZIP al backend, procesa las particiones generadas y muestra cada archivo en tablas interactivas. También permite descargar el paquete comprimido original.
+              </p>
+
+              <!-- Acciones de Consulta y Descarga en Lote -->
+              <div class="actions-split">
+                <button type="button" class="btn btn-secondary" id="btn-consult">
+                  <span class="btn-spinner" id="consult-spinner" aria-hidden="true"></span>
+                  <span class="btn-icon" id="consult-btn-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <circle cx="11" cy="11" r="8"/>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                  </span>
+                  <span class="btn-text" id="consult-btn-text">Consultar Resultados en Lote</span>
+                </button>
+
+                <button type="button" class="btn btn-outline" id="btn-download-zip" disabled title="Descargar archivo ZIP binario devuelto por el servidor">
+                  <span class="btn-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                  </span>
+                  <span class="btn-text">Descargar ZIP</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- CONTENIDO CONSULTA LÍNEA A LÍNEA (LINE) -->
+            <div id="consult-line-content" style="display: none;">
+              <!-- Selector de archivo a consultar -->
+              <div class="consult-file-select-box">
+                <div class="file-select-header">
+                  <label for="consult-file-select" class="spec-label">ARCHIVO A CONSULTAR:</label>
+                  <button type="button" class="btn-refresh-files" id="btn-refresh-consult-files" title="Actualizar lista de archivos desde /files/consult/files">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="23 4 23 10 17 10"/>
+                      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                    </svg>
+                    Actualizar Archivos
+                  </button>
+                </div>
+                <select id="consult-file-select" class="control-select full-select">
+                  <option value="all">Todas las Reservas (all)</option>
+                </select>
+              </div>
+
+              <!-- Stepper y navegación de índice -->
+              <div class="line-stepper-box">
+                <div class="stepper-header">
+                  <div class="stepper-title-wrap">
+                    <span class="stepper-title">CONSULTA LÍNEA A LÍNEA</span>
+                    <span class="stepper-counter" id="consult-index-counter">Reserva 0 de 0</span>
+                  </div>
+                  <div class="stepper-status-pill" id="consult-status-pill">NO INICIALIZADO</div>
+                </div>
+
+                <!-- Preview de la línea devuelta -->
+                <div class="current-line-preview">
+                  <div class="preview-label">LÍNEA CSV RETORNADA (GET /files/consult/line):</div>
+                  <div class="preview-code mono-text" id="consult-line-raw">— Presione "Consultar Línea Actual" o "Siguiente" —</div>
+                </div>
+
+                <!-- Desglose de campos de la reserva consultada -->
+                <div class="line-fields-grid" id="consult-fields-grid">
+                  <div class="line-field">
+                    <span class="field-k">IDENTIFICADOR</span>
+                    <span class="field-v mono-text cell-id" id="cfield-id">—</span>
+                  </div>
+                  <div class="line-field">
+                    <span class="field-k">DESTINO</span>
+                    <span class="field-v mono-text" id="cfield-destino">—</span>
+                  </div>
+                  <div class="line-field">
+                    <span class="field-k">ORIGEN</span>
+                    <span class="field-v mono-text" id="cfield-origin">—</span>
+                  </div>
+                  <div class="line-field">
+                    <span class="field-k">VUELO</span>
+                    <span class="field-v mono-text" id="cfield-flight">—</span>
+                  </div>
+                  <div class="line-field">
+                    <span class="field-k">PASAJERO</span>
+                    <span class="field-v" id="cfield-nombre">—</span>
+                  </div>
+                  <div class="line-field">
+                    <span class="field-k">EMAIL</span>
+                    <span class="field-v mono-text" id="cfield-email">—</span>
+                  </div>
+                  <div class="line-field">
+                    <span class="field-k">EDAD</span>
+                    <span class="field-v mono-text" id="cfield-edad">—</span>
+                  </div>
+                  <div class="line-field">
+                    <span class="field-k">DOCUMENTO / ASIENTO</span>
+                    <span class="field-v mono-text" id="cfield-doc-seat">—</span>
+                  </div>
+                </div>
+
+                <!-- Botones de Navegación de Línea -->
+                <div class="consult-stepper-actions">
+                  <button type="button" class="btn btn-outline" id="btn-consult-prev" disabled>
+                    &larr; Anterior
+                  </button>
+                  <button type="button" class="btn btn-secondary" id="btn-consult-current">
+                    <span class="btn-spinner" id="consult-line-spinner" aria-hidden="true"></span>
+                    <span class="btn-text" id="btn-consult-current-text">Consultar Línea</span>
+                  </button>
+                  <button type="button" class="btn btn-primary" id="btn-consult-next">
+                    Siguiente &rarr;
+                  </button>
+                </div>
+
+                <div class="consult-reset-row">
+                  <button type="button" class="btn-text-action" id="btn-reset-consult-index">
+                    Reiniciar a Primera Reserva
+                  </button>
+                  <button type="button" class="btn-text-action" id="btn-reinit-consult">
+                    Reinicializar Listas Backend (POST /initialize)
+                  </button>
                 </div>
               </div>
             </div>
 
-            <p class="consult-description">
-              Solicita el archivo ZIP al backend, procesa las particiones generadas y muestra cada archivo en tablas interactivas. También permite descargar el paquete comprimido original.
-            </p>
-
-            <!-- Acciones de Consulta y Descarga -->
-            <div class="actions-split">
-              <button type="button" class="btn btn-secondary" id="btn-consult">
-                <span class="btn-spinner" id="consult-spinner" aria-hidden="true"></span>
-                <span class="btn-icon" id="consult-btn-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="11" cy="11" r="8"/>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                  </svg>
-                </span>
-                <span class="btn-text" id="consult-btn-text">Consultar Resultados en Lote</span>
-              </button>
-
-              <button type="button" class="btn btn-outline" id="btn-download-zip" disabled title="Descargar archivo ZIP binario devuelto por el servidor">
-                <span class="btn-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7 10 12 15 17 10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                  </svg>
-                </span>
-                <span class="btn-text">Descargar ZIP</span>
-              </button>
+            <!-- Especificación del Endpoint de Consulta -->
+            <div class="endpoint-specs" id="consult-specs-box">
+              <span class="spec-label" id="consult-endpoint-label">ENDPOINT DESTINO (LOTE)</span>
+              <div class="spec-value mono-text" id="consult-endpoint-val"><span class="http-badge get">GET</span> /files/zip &bull; application/zip</div>
             </div>
 
             <!-- Mensaje de Estado / Feedback de Consulta -->
