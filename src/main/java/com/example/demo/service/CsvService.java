@@ -21,9 +21,14 @@ import java.util.stream.Stream;
 
 @Service
 public class CsvService {
+    private final IdentifierService identifierService;
     private final ArrayList<Reserva> reservaList = new ArrayList<>();
     private  Map<String, List<String>> csvReservasMap;
     private List<String> reservasGeneradas;
+
+    public CsvService(IdentifierService identifierService) {
+        this.identifierService = identifierService;
+    }
 
     public String test() {
         return "Found " + reservaList.size();
@@ -91,15 +96,15 @@ public class CsvService {
                     writer.write("identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n");
                 }
 
-                Reserva.setIdentifier(Reserva.getIdentifier() + 1);
+                reserva.setIdentifier(identifierService.generateId());
                 writer.write(reserva.getCsv());
             }
 
         }
     }
 
-    private String writeCsv(Reserva reserva) {
-        Reserva.setIdentifier(Reserva.getIdentifier() + 1);
+    private String writeCsv(Reserva reserva) throws IOException {
+        reserva.setIdentifier(identifierService.generateId());
         return "identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n" +
                 reserva.getCsv();
     }
@@ -125,7 +130,7 @@ public class CsvService {
                 writer.write("identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n");
             }
 
-            Reserva.setIdentifier(Reserva.getIdentifier() + 1);
+            reserva.setIdentifier(identifierService.generateId());
             writer.write(reserva.getCsv());
         }
 

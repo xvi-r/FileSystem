@@ -2,7 +2,7 @@ package com.example.demo.model;
 
 public class Reserva {
 
-    private static int identifier = 0;
+    private String identifier;
 
     final private String destino;
     final private String origin;
@@ -16,11 +16,19 @@ public class Reserva {
         this.passenger = passenger;
     }
 
-    public static void setIdentifier(int identifier) {
-        Reserva.identifier = identifier;
+    public Reserva(String identifier, String destino, String origin, String flightNumber, Person passenger) {
+        this.identifier = identifier;
+        this.destino = destino;
+        this.origin = origin;
+        this.flightNumber = flightNumber;
+        this.passenger = passenger;
     }
 
-    public static int getIdentifier() {
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public String getIdentifier() {
         return identifier;
     }
 
@@ -68,7 +76,7 @@ public class Reserva {
     public String getCsv() {
         return String.format(
                 "%s,%s,%s,%s,%s,%s,%d,%s,%s\n",
-                "AT-00" + Reserva.identifier,
+                identifier,
                 destino,
                 origin,
                 flightNumber,
