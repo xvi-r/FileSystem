@@ -94,7 +94,7 @@ public class Reserva {
                 passenger.getEdad(),
                 passenger.getDocumento(),
                 passenger.getAsiento(),
-                localizador != null ? localizador : ""
+                "          "
         );
     }
 

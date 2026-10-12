@@ -62,26 +62,28 @@ Procesar datos línea a línea plantea un reto de diseño sustancialmente más c
 - **En lote (Batch)**: El servidor tiene en memoria el fichero completo de antemano y puede predecir fácilmente qué pasajeros colisionan antes de escribir una sola línea en disco.
 - **Línea a línea**: Cada fila llega como una petición HTTP aislada e independiente en el tiempo. Cuando llega el primer pasajero (por ejemplo, *Lucas* de *TGV* a *CIG*), el servidor no tiene forma de saber si minutos o peticiones más tarde llegará un segundo *Lucas* con la misma ruta.
 
-#### Solución implementada:
+#### Solucion implementada y Optimizacion Notacion Big O:
 
-1. **`LocalizerService` con Búsqueda en O(1)**:
-   - Utiliza un `HashSet` en memoria (`seenCombinations`) para registrar cada combinación `NOMBRE#ORIGEN#DESTINO`.
-   - Gracias al `HashSet`, la comprobación de pertenencia se realiza en **tiempo constante O(1)**, evitando escaneos lineales O(N) sobre listas.
-   - Si se detecta una colisión (segunda o enésima vez que aparece la combinación), genera o reutiliza un código secuencial persistente (`LOC-%04d`).
+1. **`LocalizerService` con Busqueda e Insercion en O(1)**:
+   - Utiliza una estructura hash en memoria (`Map<String, Long> seenCombinations`) para registrar cada combinacion `NOMBRE#ORIGEN#DESTINO`.
+   - La comprobacion de pertenencia se realiza en **tiempo constante O(1)** amortizado.
 
-2. **Actualización Retroactiva de Ficheros (`fixCollisionInFile`)**:
-   - Cuando llega una reserva que desencadena una colisión, el servicio abre el fichero de destino correspondiente mediante `java.nio.file.Files.readAllLines`.
-   - Localiza la fila anterior perteneciente a ese mismo pasajero que tenía el localizador vacío y le asigna el código `LOC` generado.
-   - Reescribe el fichero actualizado y añade la nueva fila con el mismo código `LOC`.
-   - **Resultado**: Este mecanismo unifica ambos mundos; funciona de forma idéntica y transparente tanto si se envían líneas una a una por HTTP como si se procesa un fichero entero en bucle.
+2. **El Reto Tecnico de Big O y Solucion con Byte Seeking in situ**:
+   - **El Problema Naive (O(N^2))**: En la primera iteracion, cuando un segundo pasajero causaba una colision, el servidor abria el fichero con `Files.readAllLines()`, leia todas las lineas a memoria y reescribia el archivo completo en disco para anadir el `LOC` a la primera reserva. Para un archivo de $M$ lineas procesando $N$ reservas, esto implicaba un coste de E/S de disco de $O(M)$ por colision, escalando en el peor caso a **$O(N \cdot M) \approx O(N^2)$**, con una amplificacion de escritura enorme.
+   - **La Solucion Optima (O(1) estricto)**:
+     - Cada fila reserva preventivamente un espacio fijo de 10 bytes para el localizador (`"          "`).
+     - Al escribir la primera reserva de una ruta, el servicio indexa en memoria su posicion exacta en bytes (`comboByteOffset = file.length() - 11`).
+     - Al llegar la colision, en lugar de reescribir el archivo, se utiliza `RandomAccessFile.seek(byteOffset)`.
+     - El cursor se posiciona directamente sobre los 10 bytes reservados y sobrescribe **unicamente esos 10 bytes** con el codigo `LOC-XXXX` generado.
+     - **Complejidad resultante**: El coste de disco e I/O pasa de $O(M)$ a **$O(1)$ directo**, eliminando la necesidad de leer o reescribir ficheros y manteniendo el procesamiento linea a linea en tiempo lineal optimo global $O(N)$.
 
-3. **`IdentifierService` (Identificación Inequívoca Persistente)**:
-   - Cada reserva recibe un identificador único de billete (`AT-%04d`).
-   - El contador se persiste en disco (`uploads/last-id.txt`) para garantizar que un reinicio de la aplicación no reinicie la numeración ni genere identificadores duplicados.
-   - De forma análoga, el contador de localizadores se persiste en `uploads/last-loc-id.txt`.
+3. **`IdentifierService` (Identificacion Inequivoca Persistente)**:
+   - Cada reserva recibe un identificador unico de billete (`AT-%04d`).
+   - El contador se persiste en disco (`uploads/last-id.txt`) para garantizar que un reinicio de la aplicacion no reinicie la numeracion ni genere identificadores duplicados.
+   - De forma analoga, el contador de localizadores se persiste en `uploads/last-loc-id.txt`.
 
-4. **Gestión de Estado de Consulta en Memoria**:
-   - En la interfaz web, el puntero de navegación línea a línea se gestiona en memoria y se reinicia al recargar la página (F5), evitando bloqueos o estados persistentes para el usuario.
+4. **Gestion de Estado de Consulta en Memoria**:
+   - En la interfaz web, el puntero de navegacion linea a linea se gestiona en memoria y se reinicia al recargar la pagina (F5), evitando bloqueos o estados persistentes para el usuario.
 
 ---
 

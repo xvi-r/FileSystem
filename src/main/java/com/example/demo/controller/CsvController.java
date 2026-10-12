@@ -105,9 +105,9 @@ public class CsvController {
         return csvService.getAllCsvNames();
     }
 
-    @GetMapping("/test/local")
-    public Set<String> getSet() throws IOException {
-        localizerService.loadSeenCombinations();
-        return localizerService.seenCombinations;
-    }
+//    @GetMapping("/test/local")
+//    public Set<String> getSet() throws IOException {
+//        localizerService.loadSeenCombinations();
+//        return localizerService.seenCombinations;
+//    }
 }

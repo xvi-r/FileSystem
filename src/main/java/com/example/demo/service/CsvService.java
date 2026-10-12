@@ -100,18 +100,18 @@ public class CsvService {
 
         reserva.setIdentifier(identifierService.generateId());
         //aplicamos el localizador
-        String loc = localizerService.processAndGetLocalizador(
-                reserva.getPassenger().getNombre(),
-                reserva.getOrigin(),
-                reserva.getDestino()
-        );
-        reserva.setLocalizador(loc);
+//        String loc = localizerService.processAndGetLocalizador(
+//                reserva.getPassenger().getNombre(),
+//                reserva.getOrigin(),
+//                reserva.getDestino()
+//        );
+//        reserva.setLocalizador(loc);
 
         // Si se detecta colisión, actualizamos las líneas anteriores en este fichero que quedaron con el LOC vacío
-        if (!loc.isEmpty()) {
-            fixCollisionInFile(file, reserva.getPassenger().getNombre(), reserva.getOrigin(), reserva.getDestino(), loc);
-
-        }
+//        if (!loc.isEmpty()) {
+//            fixCollisionInFile(file, reserva.getPassenger().getNombre(), reserva.getOrigin(), reserva.getDestino(), loc);
+//
+//        }
 
         boolean fileExists = Files.exists(file);
 
@@ -125,6 +125,10 @@ public class CsvService {
             }
 
             writer.write(reserva.getCsv());
+            writer.flush();
+            localizerService.addComboIfNotExists(reserva,file);
+
+
         }
     }
 
