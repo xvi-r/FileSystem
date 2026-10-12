@@ -20,7 +20,7 @@ destino,origin,flightNumber,nombre,edad,documento,asiento,email
 
 Ejemplo de línea de entrada:
 ```csv
-GYI,BLH,KE3181,Daniel,57,59708064I,14B,Daniel_59708064I@gmail.com
+ES,FR,KE3181,Daniel,34,00000001R,18B,daniel1@ycombinator.com
 ```
 
 ### 2. Formato de Salida Generado
@@ -32,7 +32,7 @@ identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento,local
 
 Ejemplo de línea generada con colisión:
 ```csv
-AT-0001,GYI,BLH,KE3181,Daniel,Daniel_59708064I@gmail.com,57,59708064I,14B,LOC-0001
+AT-0001,ES,FR,KE3181,Daniel,daniel1@ycombinator.com,34,00000001R,18B,LOC-0001
 ```
 
 - **identifier**: Identificador único e inequívoco asignado secuencialmente a cada billete (`AT-%04d`).
@@ -66,7 +66,7 @@ El enunciado exige que el sistema admita tanto la **modalidad total (en lote)** 
 
 Procesar datos línea a línea plantea un reto de diseño sustancialmente más complejo que el procesamiento en lote:
 - **En lote (Batch)**: El servidor tiene en memoria el fichero completo de antemano y puede predecir fácilmente qué pasajeros colisionan antes de escribir una sola línea en disco.
-- **Línea a línea**: Cada fila llega como una petición HTTP aislada e independiente en el tiempo. Cuando llega el primer pasajero (por ejemplo, *Lucas* de *TGV* a *CIG*), el servidor no tiene forma de saber si minutos o peticiones más tarde llegará un segundo *Lucas* con la misma ruta.
+- **Línea a línea**: Cada fila llega como una petición HTTP aislada e independiente en el tiempo. Cuando llega el primer pasajero (por ejemplo, *Lucas* de *UK* a *IT*), el servidor no tiene forma de saber si minutos o peticiones más tarde llegará un segundo *Lucas* con la misma ruta.
 
 #### Solucion implementada y Optimizacion Notacion Big O:
 
