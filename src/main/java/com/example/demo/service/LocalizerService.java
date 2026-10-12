@@ -1,9 +1,11 @@
 package com.example.demo.service;
 
+import com.example.demo.model.Reserva;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,10 +14,15 @@ import java.util.stream.Stream;
 
 @Service
 //este servicio esta designado al parte del localizador del ejercicio
+// aunque se podria usar el DNI (seria lo mas optimo) el ejercicio dice explicitamente que deberia crear un localizador
+//si existen el mismo nombre, destino y origen, aprate de esto era una manera interesenante de aprender sobre notacion Big O
+//ya que mi primer iteracion tenia una posibilidad de llegar a O(N^2) que seria super in-optimo
+// el reto en si es que al procesar de manera verdadera linea por linea no puedes pasar el archivo directamente a memoria
+// si un usuario solo lee 20% y para vas a tener problemas con colisiones que ni existen
 public class LocalizerService {
     //SET O(1) vs O(N) un set es muchooo mas rapido que una lista y siempre nos va a dar O(1) en este caso
     //muy importante porque para tener un localizador propio vamos a tener que verificar cada escritura
-    public final Set<String> seenCombinations = new HashSet<>();
+    public final Map<String,Long> seenCombinations = new HashMap<>();
     private final Path locCounterFile = Path.of("uploads", "last-loc-id.txt");
     private long lastLocId = 0;
 
@@ -29,8 +36,6 @@ public class LocalizerService {
         if (Files.exists(locCounterFile)) {
             lastLocId = Long.parseLong(Files.readString(locCounterFile).trim());
         }
-
-        loadSeenCombinations();
     }
 
     public String buildCombo(String nombre, String origin, String destino) {
@@ -63,41 +68,46 @@ public class LocalizerService {
         return "LOC-%04d".formatted(nextId);
     }
 
-    //al empezar tenemos que popular el set con estos datos
-    public void loadSeenCombinations() throws IOException {
-        for (Path file : getAllCsvFiles()) {
-            try (BufferedReader reader = Files.newBufferedReader(file)) {
-                String line = reader.readLine(); // Saltar header como siempre
+    //aunque no uso el booleano lo voy a dejar ahi porque puede ser muy util para otras funcionalidades
+    public boolean addComboIfNotExists(Reserva reserva, Path file) throws IOException {
+        String combo = buildCombo(reserva.getPassenger().getNombre(), reserva.getOrigin(), reserva.getDestino());
+        Long comboByteOffset = file.toFile().length() - 11;
 
-                while ((line = reader.readLine()) != null) {
-                    if (line.isBlank()) continue;
+        if(!seenCombinations.containsKey(combo)) {
+            seenCombinations.put(combo, comboByteOffset);
 
-                    String[] parts = line.split(",");
-                    String destino = parts[1].trim();
-                    String origin = parts[2].trim();
-                    String nombre = parts[4].trim();
+            String loc = generateLocCode();
+            localizadores.put(combo,loc);
 
-                    // creamos la combinacion para el hashet
-                    String combo = buildCombo(nombre,origin,destino);
-                    seenCombinations.add(combo);
-                }
+            return false;
+        } else {
+            //solo a la primera iteracion tenemos que parchear la linea corespondiente despues ya no hace falta
+            if(seenCombinations.get(combo) != null)
+            {
+                //parcheamos la linea
+                patchLine(file, seenCombinations.get(combo), combo);
+                seenCombinations.put(combo,null);
             }
+
+            //y actualizamos la linea que acabamos de escribir
+            updateLastWrittenLine(file, localizadores.get(combo), combo);
+            return true;
         }
     }
 
-    public synchronized String processAndGetLocalizador(String nombre, String origin, String destino) throws IOException {
-        String combo = (nombre.trim() + "#" + origin.trim() + "#" + destino.trim()).toUpperCase();
-        if (seenCombinations.contains(combo)) {
-            // colision; asignamos o reutilizamos el código
-            if (!localizadores.containsKey(combo)) {
-                localizadores.put(combo, generateLocCode());
-            }
-            return localizadores.get(combo);
-        } else {
-            // Primera vez que vemos esta combinacion
-            seenCombinations.add(combo);
-            return "";
+    private void patchLine(Path file, Long comboByteOffset, String combo) throws IOException {
+        try (RandomAccessFile raf = new RandomAccessFile(file.toFile(), "rw")) {
+            raf.seek(seenCombinations.get(combo));
+
+            raf.write(localizadores.get(combo).getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
+    public void updateLastWrittenLine(Path file, String loc, String combo) throws IOException {
+        try (RandomAccessFile raf = new RandomAccessFile(file.toFile(), "rw")) {
+
+            raf.seek(file.toFile().length() - 11);
+            raf.write(localizadores.get(combo).getBytes(StandardCharsets.UTF_8));
         }
     }
 }
-
