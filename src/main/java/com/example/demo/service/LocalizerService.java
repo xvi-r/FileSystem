@@ -20,8 +20,10 @@ import java.util.stream.Stream;
 // el reto en si es que al procesar de manera verdadera linea por linea no puedes pasar el archivo directamente a memoria
 // si un usuario solo lee 20% y para vas a tener problemas con colisiones que ni existen
 public class LocalizerService {
-    //SET O(1) vs O(N) un set es muchooo mas rapido que una lista y siempre nos va a dar O(1) en este caso
-    //muy importante porque para tener un localizador propio vamos a tener que verificar cada escritura
+    // HASHMAP O(1) vs LISTA O(N): usamos un HashMap en vez de un Set porque necesitamos
+    // guardar el byteOffset (Long) de la primera aparicion en disco.
+    // Esto nos da comprobacion en O(1) amortizado y si hay colision sabemos exactamente 
+    // a que byte del archivo saltar con seek() para inyectr el LOC sin reescribir todo el fichero.
     public final Map<String,Long> seenCombinations = new HashMap<>();
     private final Path locCounterFile = Path.of("uploads", "last-loc-id.txt");
     private long lastLocId = 0;
@@ -29,7 +31,8 @@ public class LocalizerService {
     //si existe una colision lo ponemos aqui con un LOC
     private final Map<String, String> localizadores = new HashMap<>();
 
-    //cuando spring crea este bean genera las combinaciones ya vistas
+     // Al instanciar el servicio, cargamos el ultimo contador de localizador persistido en disco
+    // para garantizar consistencia entre reinicios del servidor
     public LocalizerService() throws IOException {
         Files.createDirectories(locCounterFile.getParent());
         // Cargar el último ID persistido si existe
