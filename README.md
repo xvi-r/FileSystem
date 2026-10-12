@@ -4,33 +4,76 @@ Sistema integral desarrollado en **Java (Spring Boot)** e interfaz web interacti
 
 ---
 
-## 📌 Visión General y Decisiones de Diseño
+## Formato y Estructura de Ficheros CSV
 
-### ¿Qué se hizo y por qué?
+### 1. Formato de Entrada (CSV subido por el usuario)
+Cabecera requerida de 8 columnas:
+```csv
+destino,origin,flightNumber,nombre,edad,documento,asiento,email
+```
 
-El objetivo principal del proyecto es leer ficheros CSV de reservas, particionarlos en ficheros independientes organizados por país/aeropuerto de destino bajo la nomenclatura estándar `AirTortilla_XX_YYYY_MM_DD.csv`, e identificar de forma unívoca cada billete y agrupar mediante **localizadores** compartidos a aquellos pasajeros que coincidan en **Nombre, Origen y Destino**.
+Ejemplo de línea de entrada:
+```csv
+GYI,BLH,KE3181,Daniel,57,59708064I,14B,Daniel_59708064I@gmail.com
+```
 
-El enunciado requiere explícitamente que el sistema permita tanto la **modalidad total (en lote)** como la **modalidad línea a línea**, tanto para la generación como para la consulta.
+### 2. Formato de Salida Generado
+Ubicación en disco: `uploads/reservas/{DESTINO}/AirTortilla_{DESTINO}_{YYYY}_{MM}_{DD}.csv`  
+Cabecera estandarizada de 10 columnas:
+```csv
+identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento,localizador
+```
+
+Ejemplo de línea generada con colisión:
+```csv
+AT-0001,GYI,BLH,KE3181,Daniel,Daniel_59708064I@gmail.com,57,59708064I,14B,LOC-0001
+```
+
+- **identifier**: Identificador único e inequívoco asignado secuencialmente a cada billete (`AT-%04d`).
+- **localizador**: 
+  - Si el pasajero no tiene colisión con nadie (combinación Nombre + Origen + Destino única), la columna queda vacía (`""`).
+  - Si dos o más reservas coinciden en **Nombre, Origen y Destino**, comparten el mismo código identificador de colisión (`LOC-%04d`).
 
 ---
 
-### 💡 Reto Técnico y Arquitectura: Modo Línea a Línea vs Modo Lote
+## Elección Tecnológica: ¿Por qué Spring Boot?
+
+Se eligió **Spring Boot** como base del proyecto por las siguientes razones:
+
+1. **Visión a largo plazo y escalabilidad**: Este proyecto representa una base de trabajo que se irá extendiendo a lo largo del tiempo. Spring Boot proporciona un ecosistema robusto y desacoplado que facilita enormemente añadir nuevas funcionalidades o cambiar especificaciones sobre la marcha sin reescribir la aplicación.
+2. **Facilidad de evolución (p. ej. migración a JSON/REST)**: Si en futuras fases de la asignatura se requiere transformar las respuestas o la persistencia a JSON, bases de datos relacionales/NoSQL o exponer APIs REST más complejas, Spring Boot permite realizar estas transiciones de manera directa mediante anotaciones y serializadores listos para usar.
+3. **Afinidad con el ecosistema Java**: Es un framework muy interesante y entretenido para aprender en profundidad, aprovechando al máximo las capacidades del lenguaje Java.
+
+---
+
+## Visión General y Decisiones de Diseño
+
+### ¿Qué se hizo y por qué?
+
+El objetivo principal del proyecto es leer ficheros CSV de reservas, particionarlos en ficheros independientes organizados por país/aeropuerto de destino bajo la nomenclatura estándar `AirTortilla_XX_YYYY_MM_DD.csv`, identificar de forma unívoca cada billete y agrupar mediante **localizadores** compartidos a aquellos pasajeros que coincidan en **Nombre, Origen y Destino**.
+
+El enunciado exige que el sistema admita tanto la **modalidad total (en lote)** como la **modalidad línea a línea**, tanto para la generación como para la consulta.
+
+---
+
+### Reto Técnico: Modo Línea a Línea vs Modo Lote
 
 Procesar datos línea a línea plantea un reto de diseño sustancialmente más complejo que el procesamiento en lote:
-- **En lote (Batch)**, el servidor tiene en memoria el fichero completo de antemano y puede predecir fácilmente qué pasajeros colisionan antes de escribir una sola línea.
-- **Línea a línea**, cada fila llega como una petición HTTP aislada e independiente en el tiempo. Cuando llega el primer pasajero (por ejemplo, *Lucas* de *TGV* a *CIG*), el servidor no tiene forma de saber si diez minutos más tarde llegará un segundo *Lucas* con la misma ruta.
+- **En lote (Batch)**: El servidor tiene en memoria el fichero completo de antemano y puede predecir fácilmente qué pasajeros colisionan antes de escribir una sola línea en disco.
+- **Línea a línea**: Cada fila llega como una petición HTTP aislada e independiente en el tiempo. Cuando llega el primer pasajero (por ejemplo, *Lucas* de *TGV* a *CIG*), el servidor no tiene forma de saber si minutos o peticiones más tarde llegará un segundo *Lucas* con la misma ruta.
 
 #### Solución implementada:
-1. **`LocalizerService` con Búsqueda en $O(1)$**: 
+
+1. **`LocalizerService` con Búsqueda en O(1)**:
    - Utiliza un `HashSet` en memoria (`seenCombinations`) para registrar cada combinación `NOMBRE#ORIGEN#DESTINO`.
-   - Gracias al `HashSet`, la comprobación de pertenencia se realiza en **tiempo constante $O(1)$**, evitando escaneos lineales $O(N)$ sobre listas.
+   - Gracias al `HashSet`, la comprobación de pertenencia se realiza en **tiempo constante O(1)**, evitando escaneos lineales O(N) sobre listas.
    - Si se detecta una colisión (segunda o enésima vez que aparece la combinación), genera o reutiliza un código secuencial persistente (`LOC-%04d`).
 
 2. **Actualización Retroactiva de Ficheros (`fixCollisionInFile`)**:
    - Cuando llega una reserva que desencadena una colisión, el servicio abre el fichero de destino correspondiente mediante `java.nio.file.Files.readAllLines`.
    - Localiza la fila anterior perteneciente a ese mismo pasajero que tenía el localizador vacío y le asigna el código `LOC` generado.
-   - Escribe el fichero actualizado de forma atómica y luego añade la nueva fila con el mismo código `LOC`.
-   - **Ventaja**: Este mecanismo unifica ambos mundos; funciona de forma idéntica y transparente tanto si se envían líneas una a una por HTTP como si se procesa un fichero entero en bucle.
+   - Reescribe el fichero actualizado y añade la nueva fila con el mismo código `LOC`.
+   - **Resultado**: Este mecanismo unifica ambos mundos; funciona de forma idéntica y transparente tanto si se envían líneas una a una por HTTP como si se procesa un fichero entero en bucle.
 
 3. **`IdentifierService` (Identificación Inequívoca Persistente)**:
    - Cada reserva recibe un identificador único de billete (`AT-%04d`).
@@ -38,11 +81,11 @@ Procesar datos línea a línea plantea un reto de diseño sustancialmente más c
    - De forma análoga, el contador de localizadores se persiste en `uploads/last-loc-id.txt`.
 
 4. **Gestión de Estado de Consulta en Memoria**:
-   - En la interfaz web, el puntero de navegación línea a línea se gestiona en memoria y se reinicia al recargar la página (F5), evitando bloqueos o estados persistentes molestos para el usuario.
+   - En la interfaz web, el puntero de navegación línea a línea se gestiona en memoria y se reinicia al recargar la página (F5), evitando bloqueos o estados persistentes para el usuario.
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 - **Backend**: Java 25 / Spring Boot 3.5 (Spring Web, SpringDoc OpenAPI / Swagger).
 - **Entrada/Salida**: Java NIO (`Path`, `Paths`, `Files`, `Stream`, `StandardOpenOption`).
@@ -51,7 +94,7 @@ Procesar datos línea a línea plantea un reto de diseño sustancialmente más c
 
 ---
 
-## 🌐 Documentación de Endpoints de la API (`/files`)
+## Documentación de Endpoints de la API (`/files`)
 
 Todos los endpoints están expuestos bajo el controlador `CsvController` con la ruta base `/files`:
 
@@ -76,38 +119,19 @@ Todos los endpoints están expuestos bajo el controlador `CsvController` con la 
 
 ---
 
-## 📂 Formato de Ficheros de Entrada y Salida
+## Casos de Prueba con Colisiones
 
-### Formato de Entrada (CSV subido)
-Cabecera estricta de 8 columnas:
-```csv
-destino,origin,flightNumber,nombre,edad,documento,asiento,email
-```
-
-### Formato de Salida Generado
-Ubicación: `uploads/reservas/{DESTINO}/AirTortilla_{DESTINO}_{YYYY}_{MM}_{DD}.csv`  
-Cabecera de 10 columnas:
-```csv
-identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento,localizador
-```
-- Si el pasajero no tiene colisión: la columna `localizador` queda vacía (`""`).
-- Si 2 o más pasajeros coinciden en Nombre, Origen y Destino: todos ellos comparten el mismo código `LOC-XXXX`.
-
----
-
-## 🧪 Casos de Prueba con Colisiones
-
-El repositorio incluye dos datasets preparados para verificar las colisiones exigidas por la especificación:
+El repositorio incluye datasets preparados para verificar las colisiones exigidas por la especificación:
 
 1. **[`reservas_tres_colisiones.csv`](reservas_tres_colisiones.csv)**: Contiene **exactamente los 3 casos de colisión**:
-   - **Caso 1 (5 personas coincidentes)**: `Daniel` con ruta `BLH` &rarr; `GYI` (Vuelo KE3181)
-   - **Caso 2 (2 personas coincidentes)**: `Sofia` con ruta `CCM` &rarr; `GID` (Vuelo NZ6574)
-   - **Caso 3 (2 personas coincidentes)**: `Lucas` con ruta `TGV` &rarr; `CIG` (Vuelo QR1765)
+   - **Caso 1 (5 personas coincidentes)**: `Daniel` con ruta `BLH` -> `GYI` (Vuelo KE3181)
+   - **Caso 2 (2 personas coincidentes)**: `Sofia` con ruta `CCM` -> `GID` (Vuelo NZ6574)
+   - **Caso 3 (2 personas coincidentes)**: `Lucas` con ruta `TGV` -> `CIG` (Vuelo QR1765)
 2. **[`reservasAir.csv`](src/main/resources/csv/reservasAir.csv)**: Dataset completo de 57 registros con las mismas colisiones más pasajeros únicos.
 
 ---
 
-## 🚀 Instrucciones de Ejecución
+## Instrucciones de Ejecución
 
 1. **Clonar el repositorio**:
    ```bash
@@ -123,4 +147,4 @@ El repositorio incluye dos datasets preparados para verificar las colisiones exi
 3. **Acceder a la interfaz web**:
    Abrir en el navegador: [http://localhost:8080](http://localhost:8080)
    - Desde la interfaz se puede alternar libremente entre la modalidad **Lote Completo** y **Línea a Línea** tanto para subir datos como para consultarlos.
-   - Los registros con colisión se resaltan automáticamente en la tabla y en la ficha de detalle con su respectivo código `LOC`.
+   - Los registros con colisión se resaltan visualmente en la tabla y en la ficha de detalle con su respectivo código `LOC`.
