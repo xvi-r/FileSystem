@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.service.CsvService;
+import com.example.demo.service.LocalizerService;
 import com.example.demo.service.ZipService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -12,14 +13,18 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/files")
 
 public class CsvController {
+    //spring nos da constructor injection que automaticamente inyecta los beans necesarios para la creacion de una instancia de
+    //esta clase
     private CsvService csvService;
     private ZipService zipService;
+    private LocalizerService localizerService;
 
     @GetMapping("/reservas")
     public String getAllReservas() {
@@ -98,5 +103,11 @@ public class CsvController {
     @GetMapping("/consult/files")
     public Map<String, Integer> getAvailableFiles() throws IOException {
         return csvService.getAllCsvNames();
+    }
+
+    @GetMapping("/test/local")
+    public Set<String> getSet() throws IOException {
+        localizerService.loadSeenCombinations();
+        return localizerService.seenCombinations;
     }
 }

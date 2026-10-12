@@ -646,6 +646,7 @@
     'edad': 'EDAD',
     'documento': 'DOCUMENTO / DNI',
     'asiento': 'ASIENTO',
+    'localizador': 'LOCALIZADOR',
   };
 
   function getDisplayHeader(rawHeader) {
@@ -679,6 +680,12 @@
         countryCode = match[1];
       }
 
+      // Detectar colisiones en este archivo (si la columna localizador tiene valor)
+      const locColIndex = fileObj.headers.findIndex(h => (h || '').toLowerCase() === 'localizador');
+      const collisionCount = locColIndex !== -1
+        ? fileObj.rows.filter(r => r[locColIndex] && r[locColIndex].trim().length > 0).length
+        : 0;
+
       // Encabezado de la partición
       const headerDiv = document.createElement('div');
       headerDiv.className = 'file-partition-header';
@@ -693,6 +700,7 @@
           </div>
           <span class="partition-filename">${escapeHtml(fileObj.filename)}</span>
           ${countryCode ? `<span class="partition-country-tag">DESTINO: ${escapeHtml(countryCode)}</span>` : ''}
+          ${collisionCount > 0 ? `<span class="partition-collision-tag">${collisionCount} colisi${collisionCount === 1 ? 'ón' : 'ones'}</span>` : ''}
         </div>
         <div class="partition-stats">
           <span class="partition-row-count">${fileObj.rows.length} reserva${fileObj.rows.length === 1 ? '' : 's'}</span>
@@ -721,23 +729,42 @@
       const tbody = document.createElement('tbody');
       fileObj.rows.forEach((rowValues) => {
         const tr = document.createElement('tr');
+
+        // Resaltar la fila si tiene localizador (colisión)
+        const isCollision = locColIndex !== -1 && rowValues[locColIndex] && rowValues[locColIndex].trim().length > 0;
+        if (isCollision) {
+          tr.className = 'row-collision';
+        }
+
         rowValues.forEach((val, colIndex) => {
           const td = document.createElement('td');
           const colHeader = (fileObj.headers[colIndex] || '').toLowerCase();
 
           if (colHeader === 'identifier') {
             td.className = 'cell-id';
+            td.textContent = val;
           } else if (colHeader === 'destino' || colHeader === 'origin') {
             td.className = 'cell-badge-code';
+            td.textContent = val;
           } else if (colHeader === 'flightnumber') {
             td.className = 'cell-mono';
+            td.textContent = val;
           } else if (colHeader === 'nombre') {
             td.className = 'cell-highlight';
+            td.textContent = val;
           } else if (colHeader === 'documento' || colHeader === 'asiento') {
             td.className = 'cell-mono';
+            td.textContent = val;
+          } else if (colHeader === 'localizador') {
+            if (val && val.trim().length > 0) {
+              td.innerHTML = `<span class="badge-collision">${escapeHtml(val)}</span>`;
+            } else {
+              td.innerHTML = `<span class="badge-no-collision">— Único</span>`;
+            }
+          } else {
+            td.textContent = val;
           }
 
-          td.textContent = val;
           tr.appendChild(td);
         });
         tbody.appendChild(tr);
@@ -1261,6 +1288,29 @@
     const doc = cols[7] || '';
     const seat = cols[8] || '';
     cfieldDocSeat.textContent = (doc && seat) ? `${doc} / ${seat}` : (doc || seat || '—');
+
+    // 9: localizador (si hay colisión de pasajero en la ruta)
+    const locVal = (cols.length >= 10 && cols[9]) ? cols[9].trim() : '';
+    const cfieldLocalizador = document.getElementById('cfield-localizador');
+    const consultCollisionBanner = document.getElementById('consult-collision-banner');
+    const consultCollisionText = document.getElementById('consult-collision-text');
+
+    if (cfieldLocalizador) {
+      if (locVal) {
+        cfieldLocalizador.innerHTML = `<span class="badge-collision">${escapeHtml(locVal)}</span>`;
+        if (consultCollisionBanner) {
+          consultCollisionBanner.style.display = 'flex';
+          if (consultCollisionText) {
+            consultCollisionText.textContent = `Coincidencia detectada para "${cols[4] || 'pasajero'}" en ruta ${cols[2] || ''} → ${cols[1] || ''}. Localizador grupal asignado: ${locVal}.`;
+          }
+        }
+      } else {
+        cfieldLocalizador.innerHTML = `<span class="badge-no-collision">Sin colisión (Pasajero único)</span>`;
+        if (consultCollisionBanner) {
+          consultCollisionBanner.style.display = 'none';
+        }
+      }
+    }
   }
 
   function clearConsultFields() {
@@ -1272,6 +1322,11 @@
     cfieldEmail.textContent = '—';
     cfieldEdad.textContent = '—';
     cfieldDocSeat.textContent = '—';
+
+    const cfieldLocalizador = document.getElementById('cfield-localizador');
+    const consultCollisionBanner = document.getElementById('consult-collision-banner');
+    if (cfieldLocalizador) cfieldLocalizador.textContent = '—';
+    if (consultCollisionBanner) consultCollisionBanner.style.display = 'none';
   }
 
   // Navegación de botones

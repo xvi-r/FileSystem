@@ -3,6 +3,7 @@ package com.example.demo.model;
 public class Reserva {
 
     private String identifier;
+    private String localizador = "";
 
     final private String destino;
     final private String origin;
@@ -30,6 +31,14 @@ public class Reserva {
 
     public String getIdentifier() {
         return identifier;
+    }
+
+    public String getLocalizador() {
+        return localizador;
+    }
+
+    public void setLocalizador(String localizador) {
+        this.localizador = localizador;
     }
 
     @Override
@@ -75,7 +84,7 @@ public class Reserva {
 
     public String getCsv() {
         return String.format(
-                "%s,%s,%s,%s,%s,%s,%d,%s,%s\n",
+                "%s,%s,%s,%s,%s,%s,%d,%s,%s,%s\n",
                 identifier,
                 destino,
                 origin,
@@ -84,7 +93,8 @@ public class Reserva {
                 passenger.getEmail(),
                 passenger.getEdad(),
                 passenger.getDocumento(),
-                passenger.getAsiento()
+                passenger.getAsiento(),
+                localizador != null ? localizador : ""
         );
     }
 

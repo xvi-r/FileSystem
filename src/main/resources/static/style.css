@@ -1405,3 +1405,71 @@ html, body {
 .footer-bullet {
   color: var(--border-medium);
 }
+
+/* ================= VISUALIZACIÓN DE COLISIONES Y LOCALIZADOR ================= */
+.row-collision {
+  background-color: rgba(245, 158, 11, 0.08) !important;
+  border-left: 3px solid #f59e0b;
+}
+
+.row-collision:hover {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+}
+
+.badge-collision {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.badge-no-collision {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+.partition-collision-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 1px 7px;
+  border-radius: 3px;
+  margin-left: 6px;
+}
+
+.collision-banner {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.collision-badge-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: #f59e0b;
+  letter-spacing: 0.04em;
+}
+
+.collision-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
