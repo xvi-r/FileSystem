@@ -22,12 +22,14 @@ import java.util.stream.Stream;
 @Service
 public class CsvService {
     private final IdentifierService identifierService;
+    private final LocalizerService localizerService;
     private final ArrayList<Reserva> reservaList = new ArrayList<>();
     private  Map<String, List<String>> csvReservasMap;
     private List<String> reservasGeneradas;
 
-    public CsvService(IdentifierService identifierService) {
+    public CsvService(IdentifierService identifierService, LocalizerService localizerService) {
         this.identifierService = identifierService;
+        this.localizerService = localizerService;
     }
 
     public String test() {
@@ -68,6 +70,8 @@ public class CsvService {
         Path directory = Path.of("uploads/reservas");
         Path uploadedFileDirectory = Path.of("uploads", "baseCSV", "uploadedCSV");
 
+        reservaList.clear();
+
         try (BufferedReader reader = Files.newBufferedReader(uploadedFileDirectory)) {
             String line = reader.readLine();
 
@@ -93,10 +97,16 @@ public class CsvService {
                     StandardOpenOption.APPEND)) {
 
                 if(!fileExists) {
-                    writer.write("identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n");
+                    writer.write("identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento,localizador\n");
                 }
 
                 reserva.setIdentifier(identifierService.generateId());
+                String loc = localizerService.processAndGetLocalizador(
+                        reserva.getPassenger().getNombre(),
+                        reserva.getOrigin(),
+                        reserva.getDestino()
+                );
+                reserva.setLocalizador(loc);
                 writer.write(reserva.getCsv());
             }
 
@@ -105,7 +115,13 @@ public class CsvService {
 
     private String writeCsv(Reserva reserva) throws IOException {
         reserva.setIdentifier(identifierService.generateId());
-        return "identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n" +
+        String loc = localizerService.processAndGetLocalizador(
+                reserva.getPassenger().getNombre(),
+                reserva.getOrigin(),
+                reserva.getDestino()
+        );
+        reserva.setLocalizador(loc);
+        return "identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento,localizador\n" +
                 reserva.getCsv();
     }
 
@@ -127,10 +143,16 @@ public class CsvService {
                 StandardOpenOption.APPEND)) {
 
             if (!fileExists) {
-                writer.write("identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento\n");
+                writer.write("identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento,localizador\n");
             }
 
             reserva.setIdentifier(identifierService.generateId());
+            String loc = localizerService.processAndGetLocalizador(
+                    reserva.getPassenger().getNombre(),
+                    reserva.getOrigin(),
+                    reserva.getDestino()
+            );
+            reserva.setLocalizador(loc);
             writer.write(reserva.getCsv());
         }
 
