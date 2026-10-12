@@ -923,20 +923,23 @@
   pillConsultBatch.addEventListener('click', () => setConsultMode('batch'));
   pillConsultLine.addEventListener('click', () => setConsultMode('line'));
 
-  // LocalStorage helpers para recordar el índice por archivo
+  // Almacenamiento en memoria del índice de consulta por archivo (se reinicia al recargar la página)
+  const inMemoryConsultIndices = {};
+
+  try {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('airtortilla_consult_index_')) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch (_) {}
+
   function getStoredIndexForFile(fileName) {
-    try {
-      const stored = localStorage.getItem('airtortilla_consult_index_' + fileName);
-      return stored !== null ? parseInt(stored, 10) : 0;
-    } catch (_) {
-      return 0;
-    }
+    return inMemoryConsultIndices[fileName] !== undefined ? inMemoryConsultIndices[fileName] : 0;
   }
 
   function setStoredIndexForFile(fileName, index) {
-    try {
-      localStorage.setItem('airtortilla_consult_index_' + fileName, index.toString());
-    } catch (_) {}
+    inMemoryConsultIndices[fileName] = index;
   }
 
   function getCurrentConsultFile() {
