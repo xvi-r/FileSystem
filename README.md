@@ -4,6 +4,12 @@ Sistema integral desarrollado en **Java (Spring Boot)** e interfaz web interacti
 
 ---
 
+## Diagrama del Sistema
+
+[![Diagrama Base del Sistema](images/diagrama_base.svg)](images/diagrama_base.svg)
+
+---
+
 ## Formato y Estructura de Ficheros CSV
 
 ### 1. Formato de Entrada (CSV subido por el usuario)

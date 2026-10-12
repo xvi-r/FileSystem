@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 852.1350833333332 1346.791" width="852.1350833333332" height="1346.791" style="--bg:#1F1F1F;--fg:#CCCCCC;--line:#CCCCCC;--accent:#0078D4;--muted:#CCCCCCCC;--surface:#181818;--border:#CCCCCC;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<g class="subgraph" data-id="S1" data-label="1. Interfaz y Modalidades Requeridas">
+  <rect x="230.30408333333332" y="40" width="581.8309999999999" height="215.60000000000002" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="230.30408333333332" y="40" width="581.8309999999999" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="242.30408333333332" y="54" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">1. Interfaz y Modalidades Requeridas</text>
+</g>
+<g class="subgraph" data-id="S2" data-label="2. Mapeo y Reglas de Negocio">
+  <rect x="65.5166666666666" y="303.6" width="464.75300000000004" height="722.6909999999999" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="65.5166666666666" y="303.6" width="464.75300000000004" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="77.5166666666666" y="317.6" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">2. Mapeo y Reglas de Negocio</text>
+</g>
+<g class="subgraph" data-id="S3" data-label="3. Partición por País de Destino">
+  <rect x="40" y="1074.291" width="287.35799999999995" height="232.5" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="40" y="1074.291" width="287.35799999999995" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="52" y="1088.291" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">3. Partición por País de Destino</text>
+</g>
+<polyline class="edge" data-from="MOD_TOTAL" data-to="MAP" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="368.7960833333333,239.60000000000002 368.7960833333333,293.6 331.05291666666665,293.6 331.05291666666665,347.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="MOD_STREAM" data-to="MAP" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="657.7115833333332,239.60000000000002 657.7115833333332,293.6 331.05291666666665,293.6 331.05291666666665,347.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="LOC_YES" data-to="PART" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="215.8646666666666,1010.2909999999999 215.8646666666666,1064.291 183.67899999999997,1064.291 183.67899999999997,1118.291" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="LOC_NO" data-to="PART" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="446.24116666666663,1010.2909999999999 446.24116666666663,1064.291 183.67899999999997,1064.291 183.67899999999997,1118.291" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="CSV_IN" data-to="MOD_TOTAL" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="513.2538333333333,137.8 513.2538333333333,161.8 368.7960833333333,161.8 368.7960833333333,185.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="CSV_IN" data-to="MOD_STREAM" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="513.2538333333333,137.8 513.2538333333333,161.8 657.7115833333332,161.8 657.7115833333332,185.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="MAP" data-to="ID" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="331.05291666666665,401.40000000000003 331.05291666666665,449.40000000000003" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="ID" data-to="COLLISION" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="331.05291666666665,503.20000000000005 331.05291666666665,551.2" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="COLLISION" data-to="LOC_YES" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="SÍ" points="282.88775,792.0258333333334 282.88775,852.191 215.8646666666666,852.191 215.8646666666666,956.491" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="COLLISION" data-to="LOC_NO" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="NO" points="379.2180833333333,792.0258333333334 379.2180833333333,852.191 446.24116666666663,852.191 446.24116666666663,956.491" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="PART" data-to="OUT_FILES" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="183.67899999999997,1155.191 183.67899999999997,1203.191" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="COLLISION" data-to="LOC_YES" data-label="SÍ">
+  <rect x="200.3646666666666" y="883.191" width="30.718000000000004" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="215.72366666666662" y="898.341" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">SÍ</text>
+</g>
+<g class="edge-label" data-from="COLLISION" data-to="LOC_NO" data-label="NO">
+  <rect x="430.24116666666663" y="883.191" width="31.906" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="446.1941666666666" y="898.341" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">NO</text>
+</g>
+<g class="node" data-id="CSV_IN" data-label="Fichero CSV de Entrada
+(Destino, Origen, NombrePasajero...)" data-shape="rectangle">
+  <rect x="386.31583333333333" y="84" width="253.87599999999995" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="513.2538333333333" y="110.9" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="513.2538333333333" dy="-3.9000000000000012">Fichero CSV de Entrada</tspan><tspan x="513.2538333333333" dy="16.900000000000002">(Destino, Origen, NombrePasajero...)</tspan></text>
+</g>
+<g class="node" data-id="MOD_TOTAL" data-label="Modalidad TOTAL
+Procesar y consultar lote completo" data-shape="rectangle">
+  <rect x="246.30408333333332" y="185.8" width="244.98399999999995" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="368.7960833333333" y="212.70000000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="368.7960833333333" dy="-3.9000000000000012">Modalidad TOTAL</tspan><tspan x="368.7960833333333" dy="16.900000000000002">Procesar y consultar lote completo</tspan></text>
+</g>
+<g class="node" data-id="MOD_STREAM" data-label="Modalidad LÍNEA A LÍNEA
+Procesar y consultar registro a registro" data-shape="rectangle">
+  <rect x="519.2880833333332" y="185.8" width="276.847" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="657.7115833333332" y="212.70000000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="657.7115833333332" dy="-3.9000000000000012">Modalidad LÍNEA A LÍNEA</tspan><tspan x="657.7115833333332" dy="16.900000000000002">Procesar y consultar registro a registro</tspan></text>
+</g>
+<g class="node" data-id="MAP" data-label="Entidad Reserva en Memoria
+Lectura de campos obligatorios" data-shape="rectangle">
+  <rect x="217.82341666666667" y="347.6" width="226.45899999999995" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="331.05291666666665" y="374.5" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="331.05291666666665" dy="-3.9000000000000012">Entidad Reserva en Memoria</tspan><tspan x="331.05291666666665" dy="16.900000000000002">Lectura de campos obligatorios</tspan></text>
+</g>
+<g class="node" data-id="ID" data-label="Identificación Inequívoca
+Asignación de ID único (AT-0001, AT-0002...)" data-shape="rectangle">
+  <rect x="182.99641666666668" y="449.40000000000003" width="296.1129999999999" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="331.05291666666665" y="476.3" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="331.05291666666665" dy="-3.9000000000000012">Identificación Inequívoca</tspan><tspan x="331.05291666666665" dy="16.900000000000002">Asignación de ID único (AT-0001, AT-0002...)</tspan></text>
+</g>
+<g class="node" data-id="COLLISION" data-label="¿Coincide Nombre + Origen + Destino?
+(≥ 2 pasajeros)" data-shape="diamond">
+  <polygon points="331.05291666666665,551.2 475.54841666666664,695.6955 331.05291666666665,840.191 186.55741666666665,695.6955" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="331.05291666666665" y="695.6955" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="331.05291666666665" dy="-3.9000000000000012">¿Coincide Nombre + Origen + Destino?</tspan><tspan x="331.05291666666665" dy="16.900000000000002">(≥ 2 pasajeros)</tspan></text>
+</g>
+<g class="node" data-id="LOC_YES" data-label="Asignar Localizador Común
+Ej: 'LOC-0001' (1 caso con ≥ 5 personas)" data-shape="rectangle">
+  <rect x="81.5166666666666" y="956.491" width="268.696" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="215.8646666666666" y="983.391" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="215.8646666666666" dy="-3.9000000000000012">Asignar Localizador Común</tspan><tspan x="215.8646666666666" dy="16.900000000000002">Ej: &#39;LOC-0001&#39; (1 caso con ≥ 5 personas)</tspan></text>
+</g>
+<g class="node" data-id="LOC_NO" data-label="Sin Localizador
+(Campo vacío)" data-shape="rectangle">
+  <rect x="378.2126666666666" y="956.491" width="136.05700000000002" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="446.24116666666663" y="983.391" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="446.24116666666663" dy="-3.9000000000000012">Sin Localizador</tspan><tspan x="446.24116666666663" dy="16.900000000000002">(Campo vacío)</tspan></text>
+</g>
+<g class="node" data-id="PART" data-label="Filtro por País de Destino" data-shape="rectangle">
+  <rect x="87.12199999999997" y="1118.291" width="193.11399999999998" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="183.67899999999997" y="1136.741" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Filtro por País de Destino</text>
+</g>
+<g class="node" data-id="OUT_FILES" data-label="Archivos de Salida:
+'AirTortilla_XX_YYYY_MM_DD.csv'
+- XX: Código ISO de 2 signos
+- YYYY_MM_DD: Fecha de reserva" data-shape="rectangle">
+  <rect x="56" y="1203.191" width="255.35799999999992" height="87.60000000000001" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="183.67899999999997" y="1246.991" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="183.67899999999997" dy="-20.8">Archivos de Salida:</tspan><tspan x="183.67899999999997" dy="16.900000000000002">&#39;AirTortilla_XX_YYYY_MM_DD.csv&#39;</tspan><tspan x="183.67899999999997" dy="16.900000000000002">- XX: Código ISO de 2 signos</tspan><tspan x="183.67899999999997" dy="16.900000000000002">- YYYY_MM_DD: Fecha de reserva</tspan></text>
+</g>
+</svg>
