@@ -123,17 +123,34 @@ Todos los endpoints están expuestos bajo el controlador `CsvController` con la 
 
 ## Casos de Prueba con Colisiones
 
-El repositorio incluye datasets preparados para verificar las colisiones exigidas por la especificación:
+El repositorio incluye datasets preparados para verificar las colisiones exigidas por la especificacion:
 
-1. **[`reservas_tres_colisiones.csv`](reservas_tres_colisiones.csv)**: Contiene **exactamente los 3 casos de colisión**:
-   - **Caso 1 (5 personas coincidentes)**: `Daniel` con ruta `BLH` -> `GYI` (Vuelo KE3181)
-   - **Caso 2 (2 personas coincidentes)**: `Sofia` con ruta `CCM` -> `GID` (Vuelo NZ6574)
-   - **Caso 3 (2 personas coincidentes)**: `Lucas` con ruta `TGV` -> `CIG` (Vuelo QR1765)
-2. **[`reservasAir.csv`](src/main/resources/csv/reservasAir.csv)**: Dataset completo de 57 registros con las mismas colisiones más pasajeros únicos.
+1. **[`reservas_tres_colisiones.csv`](reservas_tres_colisiones.csv)**: Contiene **exactamente los 3 casos de colision** con codigos ISO de 2 letras:
+   - **Caso 1 (5 personas coincidentes)**: `Daniel` con ruta `FR` -> `ES` (Vuelo KE3181)
+   - **Caso 2 (2 personas coincidentes)**: `Sofia` con ruta `DE` -> `FR` (Vuelo NZ6574)
+   - **Caso 3 (2 personas coincidentes)**: `Lucas` con ruta `UK` -> `IT` (Vuelo QR1765)
+2. **[`reservas_colisiones_nuevas.csv`](reservas_colisiones_nuevas.csv)**: Dataset alternativo con colisiones de Alejandro (x5), Elena (x2) y Marco (x2).
+3. **[`reservas_100_con_colisiones.csv`](reservas_100_con_colisiones.csv)**: Dataset extenso de 100 reservas con colisiones y vuelos independientes.
+4. **[`reservasAir.csv`](src/main/resources/csv/reservasAir.csv)**: Dataset base del sistema con 57 registros.
 
 ---
 
-## Instrucciones de Ejecución
+## Instrucciones de Ejecucion
+
+### Opcion A: Ejecucion Rapida con Docker (Imagen Publica en Docker Hub)
+
+La imagen oficial ya incluye el codigo compilado, la estructura de directorios y los ficheros CSV de prueba en `/app/mock_data/`:
+
+```bash
+docker run -d -p 8080:8080 -v $(pwd)/uploads:/app/uploads --name airtortilla-app xvirr/airtortilla:latest
+```
+
+O usando `docker compose`:
+```bash
+docker compose up -d
+```
+
+### Opcion B: Ejecucion Local con Maven Wrapper
 
 1. **Clonar el repositorio**:
    ```bash
@@ -141,12 +158,12 @@ El repositorio incluye datasets preparados para verificar las colisiones exigida
    cd FileSystem
    ```
 
-2. **Compilar y ejecutar la aplicación**:
+2. **Compilar y ejecutar la aplicacion**:
    ```bash
    ./mvnw spring-boot:run
    ```
 
 3. **Acceder a la interfaz web**:
    Abrir en el navegador: [http://localhost:8080](http://localhost:8080)
-   - Desde la interfaz se puede alternar libremente entre la modalidad **Lote Completo** y **Línea a Línea** tanto para subir datos como para consultarlos.
-   - Los registros con colisión se resaltan visualmente en la tabla y en la ficha de detalle con su respectivo código `LOC`.
+   - Desde la interfaz se puede alternar libremente entre la modalidad **Lote Completo** y **Linea a Linea** tanto para subir datos como para consultarlos.
+   - Los registros con colision se resaltan visualmente en la tabla y en la ficha de detalle con su respectivo codigo `LOC`.
