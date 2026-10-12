@@ -81,64 +81,42 @@ public class CsvService {
         }
 
         for (Reserva reserva : reservaList) {
-
-            Path destinoFolder = Path.of("uploads", "reservas", reserva.getDestino());
-            Files.createDirectories(destinoFolder);
-
-            String fileName = buildCsvFileName(reserva);
-
-            Path file = destinoFolder.resolve(fileName);
-
-            boolean fileExists = Files.exists(file);
-
-            try (BufferedWriter writer = Files.newBufferedWriter(
-                    file,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.APPEND)) {
-
-                if(!fileExists) {
-                    writer.write("identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento,localizador\n");
-                }
-
-                reserva.setIdentifier(identifierService.generateId());
-                String loc = localizerService.processAndGetLocalizador(
-                        reserva.getPassenger().getNombre(),
-                        reserva.getOrigin(),
-                        reserva.getDestino()
-                );
-                reserva.setLocalizador(loc);
-                writer.write(reserva.getCsv());
-            }
-
+            appendReservaToFile(reserva);
         }
     }
 
-    private String writeCsv(Reserva reserva) throws IOException {
+    public void processLine(String csvLine) throws IOException {
+        Reserva reserva = ReservasMapper.stringArrayToReserva(csvLine.split(","));
+        appendReservaToFile(reserva);
+    }
+
+    private void appendReservaToFile(Reserva reserva) throws IOException {
+        String destino = reserva.getDestino().toUpperCase(Locale.ROOT);
+        Path destinoFolder = Path.of("uploads", "reservas", destino);
+        Files.createDirectories(destinoFolder);
+
+        String fileName = buildCsvFileName(reserva);
+        Path file = destinoFolder.resolve(fileName);
+
         reserva.setIdentifier(identifierService.generateId());
+        //aplicamos el localizador
         String loc = localizerService.processAndGetLocalizador(
                 reserva.getPassenger().getNombre(),
                 reserva.getOrigin(),
                 reserva.getDestino()
         );
         reserva.setLocalizador(loc);
-        return "identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento,localizador\n" +
-                reserva.getCsv();
-    }
 
-    public void processLine(String csvLine) throws IOException {
-        Reserva reserva = ReservasMapper.stringArrayToReserva(csvLine.split(","));
-        String destino = reserva.getDestino().toUpperCase(Locale.ROOT);
+        // Si se detecta colisión, actualizamos las líneas anteriores en este fichero que quedaron con el LOC vacío
+        if (!loc.isEmpty()) {
+            fixCollisionInFile(file, reserva.getPassenger().getNombre(), reserva.getOrigin(), reserva.getDestino(), loc);
 
-        Path directory = Paths.get("uploads", "reservas", destino);
-        Files.createDirectories(directory);
+        }
 
-        Path csvPath = directory.resolve(buildCsvFileName(reserva));
+        boolean fileExists = Files.exists(file);
 
-        boolean fileExists = Files.exists(csvPath);
-
-        //Usando CREATE se crea el fichero si no existe
         try (BufferedWriter writer = Files.newBufferedWriter(
-                csvPath,
+                file,
                 StandardOpenOption.CREATE,
                 StandardOpenOption.APPEND)) {
 
@@ -146,16 +124,47 @@ public class CsvService {
                 writer.write("identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento,localizador\n");
             }
 
-            reserva.setIdentifier(identifierService.generateId());
-            String loc = localizerService.processAndGetLocalizador(
-                    reserva.getPassenger().getNombre(),
-                    reserva.getOrigin(),
-                    reserva.getDestino()
-            );
-            reserva.setLocalizador(loc);
             writer.write(reserva.getCsv());
         }
+    }
 
+    //cuando llegamos a encontrar una colision tenemos que volver al fichero y cambiar la linea que no tiene su loc
+    //porque la primera vez que se deteca una colision es porque YA existe una reserva con estos datos tenemos que volver
+    //y actualizar lo, subir los ficheros solo en modo batch lo haria un poco mas facil pero el ejercicio
+    //pide que tambien tiene soporte para subir los ficheros en modalidad linea por linea
+    private void fixCollisionInFile(Path file, String nombre, String origin, String destino, String loc) throws IOException {
+        if (!Files.exists(file)) return;
+
+        //parece que existe tambien esta manera de leer los ficheros que parece super rapido y sencillo
+        List<String> lines = Files.readAllLines(file);
+        List<String> updatedLines = new ArrayList<>(lines.size());
+        String targetCombo = localizerService.buildCombo(nombre, origin, destino);
+
+        for (String line : lines) {
+            // Ignorar la cabecera CSV o lineas en blanco
+            if (line.isBlank() || line.startsWith("identifier")) {
+                updatedLines.add(line);
+                continue;
+            }
+
+            //generamos el combo
+            ArrayList<String> parts = new ArrayList<>(Arrays.asList(line.split(",", -1)));
+            String fileDestino = parts.get(1);
+            String fileOrigin = parts.get(2);
+            String fileNombre = parts.get(4);
+
+            String lineCombo = localizerService.buildCombo(fileNombre, fileOrigin, fileDestino);
+
+            // Si esta línea pertenece al mismo pasajero y ruta:
+            if (lineCombo.equals(targetCombo)) {
+                //indice 9 es la posicion donde deberia estar el loc
+                parts.set(9, loc);
+                line = String.join(",", parts);
+            }
+            updatedLines.add(line);
+        }
+
+        Files.write(file, updatedLines);
     }
 
     private String buildCsvFileName(Reserva reserva) {

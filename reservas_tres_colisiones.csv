@@ -1,0 +1,10 @@
+destino,origin,flightNumber,nombre,edad,documento,asiento,email
+GYI,BLH,KE3181,Daniel,34,00000001R,18B,daniel1@ycombinator.com
+GYI,BLH,KE3181,Daniel,34,00000002A,18C,daniel2@ycombinator.com
+GYI,BLH,KE3181,Daniel,34,00000003B,18D,daniel3@ycombinator.com
+GYI,BLH,KE3181,Daniel,34,00000004C,18E,daniel4@ycombinator.com
+GYI,BLH,KE3181,Daniel,34,00000005D,18F,daniel5@ycombinator.com
+GID,CCM,NZ6574,Sofia,27,00000006W,24A,sofia1@cnet.com
+GID,CCM,NZ6574,Sofia,27,00000007E,24B,sofia2@cnet.com
+CIG,TGV,QR1765,Lucas,41,00000008A,12C,lucas1@orange.fr
+CIG,TGV,QR1765,Lucas,41,00000009B,12D,lucas2@orange.fr
