@@ -1,0 +1,16 @@
+services:
+  airtortilla-app:
+    image: xvirr/airtortilla:latest
+    container_name: airtortilla-app
+    ports:
+      - "8080:8080"
+    volumes:
+      # Raiz uploads (para persistencia de last-id.txt y last-loc-id.txt)
+      - ./uploads:/app/uploads
+      # Archivos CSV base subidos por el usuario
+      - ./uploads/baseCSV:/app/uploads/baseCSV
+      # Archivos CSV particionados por destino
+      - ./uploads/reservas:/app/uploads/reservas
+    environment:
+      - SERVER_PORT=8080
+    restart: unless-stopped
