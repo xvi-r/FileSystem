@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @RestController
@@ -64,5 +66,37 @@ public class CsvController {
         csvService.processLine(csv);
 
         return ResponseEntity.ok().build();
+    }
+
+    //genera la mapa Csv a Lista de reservas para consultar
+    @PostMapping("/consult/line/initialize")
+    public ResponseEntity<String> initializeConsultation() throws IOException {
+        csvService.initLineByLineReading();
+        return ResponseEntity.ok("CSV files loaded successfully");
+    }
+
+    @GetMapping(value = "/consult/line", produces = "text/csv")
+    public ResponseEntity<String> consultLine(
+            @RequestParam(defaultValue = "all") String file,
+            @RequestParam(defaultValue = "0") int index) throws IOException {
+
+        String csvLine;
+        try {
+            csvLine = csvService.consultLine(file,index);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return ResponseEntity.noContent().build();
+        }
+
+        // al pusar siguente pero ya no quedan reservas
+//        if (csvLine == null) {
+//            return ResponseEntity.noContent().build();
+//        }
+
+        return ResponseEntity.ok(csvLine);
+    }
+
+    @GetMapping("/consult/files")
+    public Map<String, Integer> getAvailableFiles() throws IOException {
+        return csvService.getAllCsvNames();
     }
 }
