@@ -36,9 +36,9 @@ AT-0001,ES,FR,KE3181,Daniel,daniel1@ycombinator.com,34,00000001R,18B,LOC-0001
 ```
 
 - **identifier**: Identificador único e inequívoco asignado secuencialmente a cada billete (`AT-%04d`).
-- **localizador**: 
-  - Si el pasajero no tiene colisión con nadie (combinación Nombre + Origen + Destino única), la columna queda vacía (`""`).
-  - Si dos o más reservas coinciden en **Nombre, Origen y Destino**, comparten el mismo código identificador de colisión (`LOC-%04d`).
+- **localizador**:
+    - Si el pasajero no tiene colisión con nadie (combinación Nombre + Origen + Destino única), la columna queda vacía (`""`).
+    - Si dos o más reservas coinciden en **Nombre, Origen y Destino**, comparten el mismo código identificador de colisión (`LOC-%04d`).
 
 ---
 
@@ -71,25 +71,25 @@ Procesar datos línea a línea plantea un reto de diseño sustancialmente más c
 #### Solucion implementada y Optimizacion Notacion Big O:
 
 1. **`LocalizerService` con Busqueda e Insercion en O(1)**:
-   - Utiliza una estructura hash en memoria (`Map<String, Long> seenCombinations`) para registrar cada combinacion `NOMBRE#ORIGEN#DESTINO`.
-   - La comprobacion de pertenencia se realiza en **tiempo constante O(1)** amortizado.
+    - Utiliza una estructura hash en memoria (`Map<String, Long> seenCombinations`) para registrar cada combinacion `NOMBRE#ORIGEN#DESTINO`.
+    - La comprobacion de pertenencia se realiza en **tiempo constante O(1)** amortizado.
 
 2. **El Reto Tecnico de Big O y Solucion con Byte Seeking in situ**:
-   - **El Problema Naive (O(N^2))**: En la primera iteracion, cuando un segundo pasajero causaba una colision, el servidor abria el fichero con `Files.readAllLines()`, leia todas las lineas a memoria y reescribia el archivo completo en disco para anadir el `LOC` a la primera reserva. Para un archivo de $M$ lineas procesando $N$ reservas, esto implicaba un coste de E/S de disco de $O(M)$ por colision, escalando en el peor caso a **$O(N \cdot M) \approx O(N^2)$**, con una amplificacion de escritura enorme.
-   - **La Solucion Optima (O(1) estricto)**:
-     - Cada fila reserva preventivamente un espacio fijo de 10 bytes para el localizador (`"          "`).
-     - Al escribir la primera reserva de una ruta, el servicio indexa en memoria su posicion exacta en bytes (`comboByteOffset = file.length() - 11`).
-     - Al llegar la colision, en lugar de reescribir el archivo, se utiliza `RandomAccessFile.seek(byteOffset)`.
-     - El cursor se posiciona directamente sobre los 10 bytes reservados y sobrescribe **unicamente esos 10 bytes** con el codigo `LOC-XXXX` generado.
-     - **Complejidad resultante**: El coste de disco e I/O pasa de $O(M)$ a **$O(1)$ directo**, eliminando la necesidad de leer o reescribir ficheros y manteniendo el procesamiento linea a linea en tiempo lineal optimo global $O(N)$.
+    - **El Problema Naive (O(N^2))**: En la primera iteracion, cuando un segundo pasajero causaba una colision, el servidor abria el fichero con `Files.readAllLines()`, leia todas las lineas a memoria y reescribia el archivo completo en disco para anadir el `LOC` a la primera reserva. Para un archivo de $M$ lineas procesando $N$ reservas, esto implicaba un coste de E/S de disco de $O(M)$ por colision, escalando en el peor caso a **$O(N \cdot M) \approx O(N^2)$**, con una amplificacion de escritura enorme.
+    - **La Solucion Optima (O(1) estricto)**:
+        - Cada fila reserva preventivamente un espacio fijo de 10 bytes para el localizador (`"          "`).
+        - Al escribir la primera reserva de una ruta, el servicio indexa en memoria su posicion exacta en bytes (`comboByteOffset = file.length() - 11`).
+        - Al llegar la colision, en lugar de reescribir el archivo, se utiliza `RandomAccessFile.seek(byteOffset)`.
+        - El cursor se posiciona directamente sobre los 10 bytes reservados y sobrescribe **unicamente esos 10 bytes** con el codigo `LOC-XXXX` generado.
+        - **Complejidad resultante**: El coste de disco e I/O pasa de $O(M)$ a **$O(1)$ directo**, eliminando la necesidad de leer o reescribir ficheros y manteniendo el procesamiento linea a linea en tiempo lineal optimo global $O(N)$.
 
 3. **`IdentifierService` (Identificacion Inequivoca Persistente)**:
-   - Cada reserva recibe un identificador unico de billete (`AT-%04d`).
-   - El contador se persiste en disco (`uploads/last-id.txt`) para garantizar que un reinicio de la aplicacion no reinicie la numeracion ni genere identificadores duplicados.
-   - De forma analoga, el contador de localizadores se persiste en `uploads/last-loc-id.txt`.
+    - Cada reserva recibe un identificador unico de billete (`AT-%04d`).
+    - El contador se persiste en disco (`uploads/last-id.txt`) para garantizar que un reinicio de la aplicacion no reinicie la numeracion ni genere identificadores duplicados.
+    - De forma analoga, el contador de localizadores se persiste en `uploads/last-loc-id.txt`.
 
 4. **Gestion de Estado de Consulta en Memoria**:
-   - En la interfaz web, el puntero de navegacion linea a linea se gestiona en memoria y se reinicia al recargar la pagina (F5), evitando bloqueos o estados persistentes para el usuario.
+    - En la interfaz web, el puntero de navegacion linea a linea se gestiona en memoria y se reinicia al recargar la pagina (F5), evitando bloqueos o estados persistentes para el usuario.
 
 ---
 
@@ -113,7 +113,7 @@ Todos los endpoints están expuestos bajo el controlador `CsvController` con la 
 | `POST` | `/files/upload-csv` | `multipart/form-data` (`file`) | Sube un archivo CSV completo y lo procesa en lote, particionándolo en las carpetas de destino. |
 | `POST` | `/files/line` | `text/csv` (Cuerpo de texto) | Procesa y añade una única línea CSV al archivo correspondiente a su destino, aplicando detección de colisiones. |
 | `GET` | `/files/process-csv` | Ninguno | Reprocesa el archivo previamente subido a `uploads/baseCSV/uploadedCSV.csv`. |
-| `GET` | `/files/generate-reservas` | Ninguno | Carga y genera las reservas iniciales desde el recurso `csv/reservasAir.csv`. |
+| `GET` | `/files/generate-reservas` | Ninguno | *(Testing / Diagnóstico interno)* Carga reservas en memoria para validación de parseo desde `csv/reservasAir.csv` (no persiste en disco). |
 
 ### 2. Consulta y Recuperación
 
@@ -127,6 +127,38 @@ Todos los endpoints están expuestos bajo el controlador `CsvController` con la 
 
 ---
 
+## Estructura de Carpetas del Proyecto
+
+```text
+FileSystem-main/
+├── images/
+│   └── diagrama_base.svg         # Diagrama de flujo de la arquitectura
+├── src/
+│   ├── main/
+│   │   ├── java/com/example/demo/
+│   │   │   ├── controller/       # CsvController (Endpoints REST)
+│   │   │   ├── exception/        # GlobalExceptionHandler
+│   │   │   ├── mapper/           # ReservasMapper (CSV line to Entity)
+│   │   │   ├── model/            # Reserva, Person
+│   │   │   ├── service/          # CsvService, LocalizerService, IdentifierService, ZipService
+│   │   │   └── DemoApplication.java
+│   │   └── resources/
+│   │       ├── csv/              # reservasAir.csv (dataset base)
+│   │       └── static/           # index.html, app.js, style.css (Web UI)
+│   └── test/                     # Tests unitarios y de integración
+├── uploads/                      # Directorio de persistencia en disco
+│   ├── baseCSV/                  # Almacenamiento temporal de subidas
+│   ├── reservas/{DESTINO}/       # Partición por país de destino
+│   ├── last-id.txt               # Persistencia de contador de identificadores AT-XXXX
+│   └── last-loc-id.txt           # Persistencia de contador de localizadores LOC-XXXX
+├── reservas_mock_data_optimal.csv # Dataset óptimo con colisiones y pasajeros únicos
+├── reservas_tres_colisiones.csv  # Dataset de prueba (3 colisiones: 1 con 5 personas, 2 con 2)
+├── docker-compose.yml            # Despliegue con contenedor
+└── pom.xml                       # Dependencias Maven (Spring Boot)
+```
+
+---
+
 ## Casos de Prueba con Colisiones
 
 > **Nota:** Se recomienda utilizar `reservas_mock_data_optimal.csv` por tener los datos más variados, aunque cualquiera de los CSVs proporcionados o cualquier archivo generado con la cabecera adecuada funcionará correctamente.
@@ -134,9 +166,9 @@ Todos los endpoints están expuestos bajo el controlador `CsvController` con la 
 El repositorio incluye datasets preparados para verificar las colisiones exigidas por la especificacion:
 
 1. **[`reservas_tres_colisiones.csv`](reservas_tres_colisiones.csv)**: Contiene **exactamente los 3 casos de colision** con codigos ISO de 2 letras:
-   - **Caso 1 (5 personas coincidentes)**: `Daniel` con ruta `FR` -> `ES` (Vuelo KE3181)
-   - **Caso 2 (2 personas coincidentes)**: `Sofia` con ruta `DE` -> `FR` (Vuelo NZ6574)
-   - **Caso 3 (2 personas coincidentes)**: `Lucas` con ruta `UK` -> `IT` (Vuelo QR1765)
+    - **Caso 1 (5 personas coincidentes)**: `Daniel` con ruta `FR` -> `ES` (Vuelo KE3181)
+    - **Caso 2 (2 personas coincidentes)**: `Sofia` con ruta `DE` -> `FR` (Vuelo NZ6574)
+    - **Caso 3 (2 personas coincidentes)**: `Lucas` con ruta `UK` -> `IT` (Vuelo QR1765)
 2. **[`reservas_colisiones_nuevas.csv`](reservas_colisiones_nuevas.csv)**: Dataset alternativo con colisiones de Alejandro (x5), Elena (x2) y Marco (x2).
 3. **[`reservas_100_con_colisiones.csv`](reservas_100_con_colisiones.csv)**: Dataset extenso de 100 reservas con colisiones y vuelos independientes.
 4. **[`reservasAir.csv`](src/main/resources/csv/reservasAir.csv)**: Dataset base del sistema con 57 registros.
@@ -191,5 +223,5 @@ Si se prefiere lanzar el contenedor manualmente con `docker run`, seleccionar el
 
 3. **Acceder a la interfaz web**:
    Abrir en el navegador: [http://localhost:8080](http://localhost:8080)
-   - Desde la interfaz se puede alternar libremente entre la modalidad **Lote Completo** y **Linea a Linea** tanto para subir datos como para consultarlos.
-   - Los registros con colision se resaltan visualmente en la tabla y en la ficha de detalle con su respectivo codigo `LOC`.
+    - Desde la interfaz se puede alternar libremente entre la modalidad **Lote Completo** y **Linea a Linea** tanto para subir datos como para consultarlos.
+    - Los registros con colision se resaltan visualmente en la tabla y en la ficha de detalle con su respectivo codigo `LOC`.
