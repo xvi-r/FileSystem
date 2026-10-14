@@ -204,7 +204,10 @@ public class CsvService {
 
         List<Path> csvs;
 
-        try(Stream<Path> paths = Files.walk(Path.of("uploads", "reservas"))){
+        Path dir = Path.of("uploads", "reservas");
+
+        Files.createDirectories(dir);
+        try(Stream<Path> paths = Files.walk(dir)){
            csvs = paths.filter(Files::isRegularFile).toList();
         };
 
