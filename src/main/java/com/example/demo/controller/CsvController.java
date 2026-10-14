@@ -46,7 +46,7 @@ public class CsvController {
         return ResponseEntity.ok("Reserva Uploaded Succesfully");
     }
 
-    @GetMapping("/process-csvç")
+    @GetMapping("/process-csv")
     public ResponseEntity<String> processCsv() throws IOException {
         csvService.processCsv();
         return ResponseEntity.ok("Csv successfully processed");

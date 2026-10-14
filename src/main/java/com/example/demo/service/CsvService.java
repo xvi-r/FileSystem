@@ -55,6 +55,8 @@ public class CsvService {
         Path uploadDirectory = Paths.get("uploads", "baseCSV");
 
         Path filePath = uploadDirectory.resolve("uploadedCSV");
+        //deberiamos asegurar que existe aunque viene con el docker, y el proyecto
+        Files.createDirectories(uploadDirectory);
         System.out.println("Resolved path: " + filePath.toAbsolutePath());
         System.out.println("Exists: " + Files.exists(filePath));
 
