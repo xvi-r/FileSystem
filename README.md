@@ -148,16 +148,33 @@ El repositorio incluye datasets preparados para verificar las colisiones exigida
 
 ### Opcion A: Ejecucion Rapida con Docker (Imagen Publica en Docker Hub)
 
-La imagen oficial ya incluye el codigo compilado, la estructura de directorios y los ficheros CSV de prueba en `/app/mock_data/`:
+La imagen oficial ya incluye el codigo compilado, la estructura de directorios y los ficheros CSV de prueba en `/app/mock_data/`.
 
-```bash
-docker run -d -p 8080:8080 -v $(pwd)/uploads:/app/uploads --name airtortilla-app xvirr/airtortilla:latest
-```
+#### 1. Metodo Recomendado: Docker Compose
+Gestiona puertos y rutas de volumenes automaticamente en cualquier sistema:
 
-O usando `docker compose`:
 ```bash
 docker compose up -d
 ```
+
+#### 2. Metodo Alternativo: `docker run` manual segun Terminal / SO
+
+Si se prefiere lanzar el contenedor manualmente con `docker run`, seleccionar el comando segun el sistema operativo o terminal:
+
+- **Linux / macOS (Bash / Zsh):**
+  ```bash
+  docker run -d -p 8080:8080 -v $(pwd)/uploads:/app/uploads --name airtortilla-app xvirr/airtortilla:latest
+  ```
+
+- **Windows (PowerShell):**
+  ```powershell
+  docker run -d -p 8080:8080 -v ${PWD}/uploads:/app/uploads --name airtortilla-app xvirr/airtortilla:latest
+  ```
+
+- **Windows (CMD):**
+  ```cmd
+  docker run -d -p 8080:8080 -v "%cd%/uploads:/app/uploads" --name airtortilla-app xvirr/airtortilla:latest
+  ```
 
 ### Opcion B: Ejecucion Local con Maven Wrapper
 
