@@ -54,7 +54,7 @@ public class CsvService {
     public void storeCsv(MultipartFile file) throws IOException {
         Path uploadDirectory = Paths.get("uploads", "baseCSV");
 
-        Path filePath = uploadDirectory.resolve("uploadedCSV");
+        Path filePath = uploadDirectory.resolve("uploadedCSV.csv");
         //deberiamos asegurar que existe aunque viene con el docker, y el proyecto
         Files.createDirectories(uploadDirectory);
         System.out.println("Resolved path: " + filePath.toAbsolutePath());
@@ -70,7 +70,7 @@ public class CsvService {
     public void processCsv() throws IOException {
         System.out.println("ENTERED");
         Path directory = Path.of("uploads/reservas");
-        Path uploadedFileDirectory = Path.of("uploads", "baseCSV", "uploadedCSV");
+        Path uploadedFileDirectory = Path.of("uploads", "baseCSV", "uploadedCSV.csv");
 
         reservaList.clear();
 

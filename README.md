@@ -112,7 +112,7 @@ Todos los endpoints están expuestos bajo el controlador `CsvController` con la 
 | :--- | :--- | :--- | :--- |
 | `POST` | `/files/upload-csv` | `multipart/form-data` (`file`) | Sube un archivo CSV completo y lo procesa en lote, particionándolo en las carpetas de destino. |
 | `POST` | `/files/line` | `text/csv` (Cuerpo de texto) | Procesa y añade una única línea CSV al archivo correspondiente a su destino, aplicando detección de colisiones. |
-| `GET` | `/files/process-csv` | Ninguno | Reprocesa el archivo previamente subido a `uploads/baseCSV/uploadedCSV`. |
+| `GET` | `/files/process-csv` | Ninguno | Reprocesa el archivo previamente subido a `uploads/baseCSV/uploadedCSV.csv`. |
 | `GET` | `/files/generate-reservas` | Ninguno | Carga y genera las reservas iniciales desde el recurso `csv/reservasAir.csv`. |
 
 ### 2. Consulta y Recuperación
@@ -129,6 +129,8 @@ Todos los endpoints están expuestos bajo el controlador `CsvController` con la 
 
 ## Casos de Prueba con Colisiones
 
+> **Nota:** Se recomienda utilizar `reservas_mock_data_optimal.csv` por tener los datos más variados, aunque cualquiera de los CSVs proporcionados o cualquier archivo generado con la cabecera adecuada funcionará correctamente.
+
 El repositorio incluye datasets preparados para verificar las colisiones exigidas por la especificacion:
 
 1. **[`reservas_tres_colisiones.csv`](reservas_tres_colisiones.csv)**: Contiene **exactamente los 3 casos de colision** con codigos ISO de 2 letras:
@@ -138,6 +140,7 @@ El repositorio incluye datasets preparados para verificar las colisiones exigida
 2. **[`reservas_colisiones_nuevas.csv`](reservas_colisiones_nuevas.csv)**: Dataset alternativo con colisiones de Alejandro (x5), Elena (x2) y Marco (x2).
 3. **[`reservas_100_con_colisiones.csv`](reservas_100_con_colisiones.csv)**: Dataset extenso de 100 reservas con colisiones y vuelos independientes.
 4. **[`reservasAir.csv`](src/main/resources/csv/reservasAir.csv)**: Dataset base del sistema con 57 registros.
+5. **[`reservas_mock_data_optimal.csv`](reservas_mock_data_optimal.csv)**: Dataset de 50 registros con datos variados de colisiones y pasajeros únicos.
 
 ---
 
