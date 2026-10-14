@@ -102,6 +102,7 @@ public class CsvController {
 
     @GetMapping("/consult/files")
     public Map<String, Integer> getAvailableFiles() throws IOException {
+        csvService.initLineByLineReading();
         return csvService.getAllCsvNames();
     }
 
