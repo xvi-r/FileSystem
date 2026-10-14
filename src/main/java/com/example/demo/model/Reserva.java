@@ -95,6 +95,8 @@ public class Reserva {
                 passenger.getDocumento(),
                 passenger.getAsiento(),
                 "          "
+                //lo de arriba es un buffer de 10 bytes. Porque? cuando llega a parchear una reserva necesitamos este
+                //espeacio reservado para insertar el localizador. si NO tenemos este buffer sobre-escrimos informacion importante
         );
     }
 
