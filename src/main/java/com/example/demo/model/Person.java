@@ -1,64 +1,44 @@
 package com.example.demo.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(
+    name = "persons",
+    indexes = {
+        @Index(name = "idx_person_documento", columnList = "documento", unique = true),
+        @Index(name = "idx_person_nombre", columnList = "nombre")
+    }
+)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString
 public class Person {
-    final private String nombre;
-    final private String email;
-    final private int edad;
-    final private String documento;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "nombre", length = 120, nullable = false)
+    private String nombre;
+
+    @Column(name = "email", length = 150)
+    private String email;
+
+    @Column(name = "edad")
+    private int edad;
+
+    @Column(name = "documento", length = 50, unique = true, nullable = false)
+    private String documento;
+
+    @Column(name = "asiento", length = 10)
     private String asiento;
 
-    @Override
-    public String toString() {
-        return "Person{" +
-                "nombre='" + nombre + '\'' +
-                ", email='" + email + '\'' +
-                ", edad=" + edad +
-                ", documento='" + documento + '\'' +
-                ", asiento='" + asiento + '\'' +
-                '}';
-    }
-
-    public Person(String nombre, String edad, String documento, String asiento, String email) {
-        this.nombre = nombre;
-        this.edad = Integer.parseInt(edad);
-        this.documento = documento;
-        this.asiento = asiento;
-        this.email = email;
-    }
-
-    public String getAsiento() {
-        return asiento;
-    }
-
-
-    public void setAsiento(String asiento) {
-        this.asiento = asiento;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public int getEdad() {
-        return edad;
-    }
-
-    public String getDocumento() {
-        return documento;
-    }
-
     public String getCsvString() {
-        return String.format(
-                "%s,%s,%d,%s,%s",
-                nombre,
-                email,
-                edad,
-                documento,
-                asiento
-        );
+        return String.format("%s,%s,%d,%s,%s", nombre, email, edad, documento, asiento);
     }
 }
