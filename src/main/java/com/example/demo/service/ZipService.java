@@ -1,47 +1,60 @@
 package com.example.demo.service;
 
+import com.example.demo.model.Reserva;
+import com.example.demo.repository.ReservaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+// servicio para generar el zip con los csv particionados al vuelo sacando los datos de la bd
 @Service
-//servicio dedicado a generar el zip que vamos a mandar al frontend para la consulta batch
+@RequiredArgsConstructor
 public class ZipService {
 
-    public  byte[] createZip() throws IOException {
-        List<Path> csvFiles;
-        //encontramos todos los ficheros generados
-        //isRegularFile para que evitamos los paths que aun no apuntan a un fichero
-        try (Stream<Path> paths = Files.walk(Path.of("uploads", "reservas"))) {
-            csvFiles = paths.filter(Files::isRegularFile).toList();
+    private final ReservaRepository reservaRepository;
 
-            //try with resources para cerrar los automaticamente
-            try (ByteArrayOutputStream output = new ByteArrayOutputStream(); ZipOutputStream zip = new ZipOutputStream(output)) {
+    public byte[] createZip() throws IOException {
+        List<String> destinos = reservaRepository.findDistinctDestinos();
+        String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd"));
 
-                for (Path csvFile : csvFiles) {
-                    //generamos un nuevo fichero en el zip
-                    ZipEntry entry = new ZipEntry(
-                            csvFile.getFileName().toString()
-                    );
+        try (ByteArrayOutputStream output = new ByteArrayOutputStream();
+             ZipOutputStream zip = new ZipOutputStream(output)) {
 
-                    //decimos al zip que estamos usando este fichero
+            if (destinos.isEmpty()) {
+                ZipEntry emptyEntry = new ZipEntry("AirTortilla_VACIO.txt");
+                zip.putNextEntry(emptyEntry);
+                zip.write("No hay reservas en la base de datos actualmente.\n".getBytes(StandardCharsets.UTF_8));
+                zip.closeEntry();
+            } else {
+                for (String destino : destinos) {
+                    String fileName = "AirTortilla_%s_%s.csv".formatted(destino, dateStr);
+                    ZipEntry entry = new ZipEntry(fileName);
                     zip.putNextEntry(entry);
-                    //copiamos el contendio que corresponde
-                    Files.copy(csvFile, zip);
+
+                    // escribimos la cabecera tipica del csv
+                    String header = "identifier,destino,origin,flightNumber,nombre,email,edad,documento,asiento,localizador\n";
+                    zip.write(header.getBytes(StandardCharsets.UTF_8));
+
+                    //volcamos las reservas de este destino que vienen de la bd
+                    List<Reserva> reservas = reservaRepository.findByDestinoOrderByIdAsc(destino);
+                    for (Reserva r : reservas) {
+                        zip.write(r.getCsv().getBytes(StandardCharsets.UTF_8));
+                    }
+
                     zip.closeEntry();
                 }
-
-                zip.finish();
-                return output.toByteArray();
             }
+
+            zip.finish();
+            return output.toByteArray();
         }
     }
 }
