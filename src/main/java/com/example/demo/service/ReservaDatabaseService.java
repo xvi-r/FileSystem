@@ -20,6 +20,7 @@ public class ReservaDatabaseService {
 
     private final ReservaRepository reservaRepository;
     private final com.example.demo.repository.PersonRepository personRepository;
+    private final AuditService auditService;
 
     //contadores atomicos pa generar codigos incrementales sin que se pisen hilos
     private final AtomicLong identifierCounter = new AtomicLong(0);
@@ -103,12 +104,23 @@ public class ReservaDatabaseService {
                 //si es la primera colision generamos uno nuevo y parcheamos los anteriores
                 sharedLoc = generateNextLocalizer();
 
+                //en teoria no hace falta el loop porque la unica possible collision sin un loc ya existente seria la
+                // primera collision
                 for (Reserva prior : existingCollisions) {
                     if (prior.getLocalizador() == null || prior.getLocalizador().isBlank()) {
                         prior.setLocalizador(sharedLoc);
                         reservaRepository.save(prior);
                     }
                 }
+
+                // guardamos en auditoria que se resolvio una colision
+                auditService.logAction(
+                        "COLLISION_RESOLVED",
+                        "Reserva",
+                        reserva.getIdentifier(),
+                        "collision resolved with locator '%s' for passenger '%s' on route %s->%s"
+                                .formatted(sharedLoc, nombre, origin, destino)
+                );
             }
 
             reserva.setLocalizador(sharedLoc);
@@ -117,7 +129,18 @@ public class ReservaDatabaseService {
         }
 
         //guardamos la reserva en postgres
-        return reservaRepository.save(reserva);
+        Reserva saved = reservaRepository.save(reserva);
+
+        // registramos en la auditoria que se creo la reserva
+        auditService.logAction(
+                "RESERVA_CREATED",
+                "Reserva",
+                saved.getIdentifier(),
+                "created reservation: flight=%s route=%s->%s passenger=%s locator=%s"
+                        .formatted(saved.getFlightNumber(), origin, destino, nombre, saved.getLocalizador())
+        );
+
+        return saved;
     }
 
     public List<Reserva> getAll() {

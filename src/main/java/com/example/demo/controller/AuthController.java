@@ -28,6 +28,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
+    private final com.example.demo.service.AuditService auditService;
     private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
     @PostMapping("/login")
@@ -46,12 +47,25 @@ public class AuthController {
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
+        //en teoria esta linea no es necesaria
+        //solo si usamos nuestro overload de logAction que no necesita que pasas el usuario (lo coge desde el context)
         SecurityContextHolder.setContext(context);
         securityContextRepository.saveContext(context, request, response);
 
         //buscamos los datos completos del usuario
         UserResponseDto userDto = userService.getUserByUsername(authentication.getName())
                 .orElseThrow(() -> new IllegalStateException("authenticated user not found in database"));
+
+        // guardamos la accion en los logs para que quede constancia del login
+        // usando getRemote addr podemos sacar la IP de la solicitacion como un log real
+        auditService.logAction(
+                userDto.getUsername(),
+                "AUTH_LOGIN",
+                "User",
+                userDto.getId().toString(),
+                "user logged in successfully with role " + userDto.getRole(),
+                request.getRemoteAddr()
+        );
 
         log.info("user '{}' logged in successfully", userDto.getUsername());
         return ResponseEntity.ok(userDto);
@@ -75,6 +89,7 @@ public class AuthController {
                 ? SecurityContextHolder.getContext().getAuthentication().getName()
                 : "UNKNOWN";
 
+        auditService.logAction(username, "AUTH_LOGOUT", "User", null, "user logged out", request.getRemoteAddr());
         log.info("user '{}' logged out", username);
 
         SecurityContextHolder.clearContext();
