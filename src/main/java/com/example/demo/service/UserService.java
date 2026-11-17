@@ -22,6 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditService auditService;
 
     //crear un nuevo usuario comprobando que no exista ya
     @Transactional
@@ -56,6 +57,14 @@ public class UserService {
 
         User saved = userRepository.save(user);
 
+        //guardamos en auditoria que se creo el usuario nuevo
+        auditService.logAction(
+                "USER_CREATED",
+                "User",
+                saved.getId().toString(),
+                "created user '" + saved.getUsername() + "' with role " + saved.getRole()
+        );
+
         log.info("admin created new user: {} with role: {}", saved.getUsername(), saved.getRole());
         return UserResponseDto.fromEntity(saved);
     }
@@ -82,6 +91,14 @@ public class UserService {
         //le damos la vuelta al booleano
         user.setEnabled(!user.isEnabled());
         User updated = userRepository.save(user);
+
+        // dejamos rastro en la tabla de auditoria
+        auditService.logAction(
+                "USER_STATUS_TOGGLED",
+                "User",
+                updated.getId().toString(),
+                "user status changed for '" + updated.getUsername() + "' to enabled=" + updated.isEnabled()
+        );
 
         log.info("user status '{}' changed to enabled={}", updated.getUsername(), updated.isEnabled());
         return UserResponseDto.fromEntity(updated);
