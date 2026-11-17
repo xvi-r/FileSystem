@@ -3,98 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AirTortilla — Gestión y Consulta de Reservas en Lote</title>
-  <link rel="stylesheet" href="style.css">
+  <title>AirTortilla OPS — Centro de Control de Reservas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
   <!-- Librería JSZip local para leer y descomprimir el archivo ZIP retornado por el backend -->
   <script src="jszip.min.js"></script>
 </head>
 <body>
   <div class="app-container">
-    <!-- Barra superior de navegación / Encabezado -->
+
+    <!-- ================= BARRA SUPERIOR ================= -->
     <header class="app-header">
       <div class="header-branding">
-        <div class="brand-symbol">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"/>
+        <div class="brand-symbol" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
           </svg>
         </div>
         <div class="brand-text">
-          <div class="brand-title">AIRTORTILLA</div>
-          <div class="brand-subtitle">Operaciones de Vuelo &bull; Motor de Procesamiento por Lotes</div>
+          <div class="brand-title">AirTortilla <span class="brand-ops">OPS</span></div>
+          <div class="brand-subtitle">Centro de Control de Reservas</div>
         </div>
       </div>
 
       <div class="header-meta">
-        <div class="meta-item">
-          <span class="meta-label">ENTORNO</span>
-          <span class="meta-value">OPERACIONES INTERNAS</span>
+        <div class="meta-item meta-hide-sm">
+          <span class="meta-label">Entorno</span>
+          <span class="meta-value">Operaciones internas</span>
         </div>
-        <div class="meta-divider" aria-hidden="true"></div>
-        <div class="meta-item">
-          <span class="meta-label">PASARELA</span>
-          <span class="meta-value meta-mono">/files/*</span>
-        </div>
-        <div class="meta-divider" aria-hidden="true"></div>
+        <div class="meta-divider meta-hide-sm" aria-hidden="true"></div>
         <div class="system-indicator" id="system-indicator">
           <span class="status-dot"></span>
           <span class="status-label" id="system-status-text">SISTEMA ACTIVO</span>
         </div>
+        <div class="meta-divider" aria-hidden="true"></div>
+        <div class="clock-block">
+          <span class="meta-label">Hora UTC</span>
+          <span class="clock-value" id="session-timestamp">—</span>
+        </div>
+        <div class="meta-divider" aria-hidden="true"></div>
+        <div class="auth-header-container" id="auth-header-container">
+          <button type="button" class="btn-auth-pill" id="btn-open-login">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span>Iniciar sesión</span>
+          </button>
+          <div class="auth-user-box" id="auth-user-box" style="display: none;">
+            <div class="auth-avatar" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="auth-identity">
+              <span class="auth-username-text" id="auth-user-name">usuario</span>
+              <span class="auth-role-badge" id="auth-user-role">EMPLEADO</span>
+            </div>
+            <button type="button" class="btn-admin-shortcut" id="btn-open-admin" style="display: none;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Administración
+            </button>
+            <button type="button" class="btn-auth-logout" id="btn-logout" title="Cerrar sesión" aria-label="Cerrar sesión">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
     </header>
 
-    <!-- Subencabezado / Contexto Operativo -->
+    <!-- ================= SUBBARRA DE CONTEXTO ================= -->
     <div class="context-banner">
+      <nav class="context-crumbs" aria-label="Ubicación">
+        <span>Operaciones</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        <span class="crumb-current">Procesamiento de reservas</span>
+      </nav>
       <div class="context-info">
-        <span class="context-tag">MODO LOTE ÚNICAMENTE</span>
-        <span class="context-desc">Partición de reservas por país de destino &bull; Formato de salida: <code class="code-pill">AirTortilla_XX_YYYY_MM_DD.csv</code></span>
+        <span class="context-tag">Partición por país de destino</span>
+        <span class="context-desc">Salida <code class="code-pill">AirTortilla_XX_YYYY_MM_DD.csv</code></span>
       </div>
-      <div class="context-timestamp" id="session-timestamp">UTC ACTIVO</div>
     </div>
 
-    <!-- Área Principal de Trabajo -->
+    <!-- ================= ÁREA PRINCIPAL ================= -->
     <main class="main-content">
-      <!-- Rejilla de Operaciones -->
       <div class="panels-grid">
 
-        <!-- ================= PANEL 1: CARGA DE CSV EN LOTE ================= -->
+        <!-- ================= PANEL 1: CARGA ================= -->
         <section class="ops-panel" id="panel-upload" aria-labelledby="upload-heading">
           <div class="panel-header">
             <div class="panel-badge">01</div>
             <div class="panel-headings">
-              <h2 id="upload-heading" class="panel-title">Carga de CSV en Lote</h2>
-              <p class="panel-subtitle">Subir archivo de reservas para su partición por país de destino</p>
+              <h2 id="upload-heading" class="panel-title">Ingesta de reservas</h2>
+              <p class="panel-subtitle">Carga de manifiesto CSV para su partición por país de destino</p>
             </div>
           </div>
 
           <div class="panel-body">
-            <!-- Zona de Carga / Selector de Archivos -->
+            <!-- Selector de modalidad -->
+            <div class="upload-mode-selector" id="upload-mode-selector">
+              <span class="mode-label">Modalidad</span>
+              <div class="mode-pills" role="radiogroup" aria-label="Modalidad de subida">
+                <button type="button" class="mode-pill active" id="pill-mode-batch" role="radio" aria-checked="true">
+                  <span class="mode-pill-dot"></span>
+                  Lote completo
+                </button>
+                <button type="button" class="mode-pill" id="pill-mode-line" role="radio" aria-checked="false">
+                  <span class="mode-pill-dot"></span>
+                  Línea a línea
+                </button>
+              </div>
+            </div>
+
+            <!-- Zona de carga -->
             <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Seleccionar archivo CSV para subir">
               <input type="file" id="file-input" accept=".csv,text/csv" class="file-input-hidden" aria-hidden="true">
               <div class="drop-zone-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                   <polyline points="17 8 12 3 7 8"/>
                   <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
               </div>
               <div class="drop-zone-prompt">
-                <span class="prompt-main">Haga clic para seleccionar archivo CSV <span class="prompt-alt">o arrástrelo y suéltelo aquí</span></span>
-                <span class="prompt-sub">Formato admitido: reservas delimitadas por comas (<span class="mono-text">.csv</span>)</span>
+                <span class="prompt-main">Seleccione un manifiesto CSV <span class="prompt-alt">o arrástrelo aquí</span></span>
+                <span class="prompt-sub">Formato admitido: valores separados por comas (<span class="mono-text">.csv</span>)</span>
               </div>
             </div>
 
-            <!-- Información del Archivo Seleccionado -->
+            <!-- Archivo seleccionado -->
             <div class="file-summary" id="file-summary" style="display: none;" aria-live="polite">
               <div class="file-summary-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
-                  <line x1="16" y1="13" x2="8" y2="13"/>
-                  <line x1="16" y1="17" x2="8" y2="17"/>
-                  <polyline points="10 9 9 9 8 9"/>
                 </svg>
               </div>
               <div class="file-summary-meta">
@@ -102,34 +141,19 @@
                 <span class="file-size" id="selected-file-size">—</span>
               </div>
               <button type="button" class="btn-clear-file" id="btn-clear-file" title="Quitar archivo seleccionado" aria-label="Quitar archivo seleccionado">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <line x1="18" y1="6" x2="6" y2="18"/>
                   <line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
               </button>
             </div>
 
-            <!-- Selector de Modalidad de Carga -->
-            <div class="upload-mode-selector" id="upload-mode-selector">
-              <span class="mode-label">MODALIDAD DE SUBIDA:</span>
-              <div class="mode-pills" role="radiogroup" aria-label="Modalidad de Subida">
-                <button type="button" class="mode-pill active" id="pill-mode-batch" role="radio" aria-checked="true">
-                  <span class="mode-pill-dot"></span>
-                  Lote Completo (POST /files/upload-csv)
-                </button>
-                <button type="button" class="mode-pill" id="pill-mode-line" role="radio" aria-checked="false">
-                  <span class="mode-pill-dot"></span>
-                  Línea a Línea (POST /files/line)
-                </button>
-              </div>
-            </div>
-
-            <!-- Botón de Subida en Lote (Modo Lote) -->
+            <!-- Modo lote -->
             <div class="action-block" id="action-batch-block">
-              <button type="button" class="btn btn-primary" id="btn-upload" disabled>
+              <button type="button" class="btn btn-primary btn-block" id="btn-upload" disabled>
                 <span class="btn-spinner" id="upload-spinner" aria-hidden="true"></span>
                 <span class="btn-icon" id="upload-btn-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <polyline points="17 8 12 3 7 8"/>
                     <line x1="12" y1="3" x2="12" y2="15"/>
                   </svg>
@@ -138,78 +162,48 @@
               </button>
             </div>
 
-            <!-- Controles y Vista de Subida Línea a Línea (Modo Línea a Línea) -->
+            <!-- Modo línea a línea -->
             <div class="line-stepper-box" id="line-stepper-box" style="display: none;">
               <div class="stepper-header">
                 <div class="stepper-title-wrap">
-                  <span class="stepper-title">PROCESAMIENTO LÍNEA A LÍNEA</span>
+                  <span class="stepper-title">Envío secuencial</span>
                   <span class="stepper-counter" id="line-counter">Línea 0 de 0</span>
                 </div>
                 <div class="stepper-status-pill" id="line-status-pill">ESPERANDO INICIO</div>
               </div>
 
-              <!-- Vista previa de la línea CSV actual -->
               <div class="current-line-preview">
-                <div class="preview-label">LÍNEA CSV ACTUAL (BODY TEXT/CSV):</div>
+                <div class="preview-label">Registro actual</div>
                 <div class="preview-code mono-text" id="current-line-raw">—</div>
               </div>
 
-              <!-- Ficha con datos parseados de la reserva actual -->
               <div class="line-fields-grid" id="line-fields-grid">
-                <div class="line-field">
-                  <span class="field-k">DESTINO</span>
-                  <span class="field-v mono-text" id="field-destino">—</span>
-                </div>
-                <div class="line-field">
-                  <span class="field-k">ORIGEN</span>
-                  <span class="field-v mono-text" id="field-origin">—</span>
-                </div>
-                <div class="line-field">
-                  <span class="field-k">VUELO</span>
-                  <span class="field-v mono-text" id="field-flight">—</span>
-                </div>
-                <div class="line-field">
-                  <span class="field-k">PASAJERO</span>
-                  <span class="field-v" id="field-nombre">—</span>
-                </div>
-                <div class="line-field">
-                  <span class="field-k">EDAD</span>
-                  <span class="field-v mono-text" id="field-edad">—</span>
-                </div>
-                <div class="line-field">
-                  <span class="field-k">DOCUMENTO</span>
-                  <span class="field-v mono-text" id="field-documento">—</span>
-                </div>
-                <div class="line-field">
-                  <span class="field-k">ASIENTO</span>
-                  <span class="field-v mono-text" id="field-asiento">—</span>
-                </div>
-                <div class="line-field">
-                  <span class="field-k">EMAIL</span>
-                  <span class="field-v mono-text" id="field-email">—</span>
-                </div>
+                <div class="line-field"><span class="field-k">Destino</span><span class="field-v mono-text" id="field-destino">—</span></div>
+                <div class="line-field"><span class="field-k">Origen</span><span class="field-v mono-text" id="field-origin">—</span></div>
+                <div class="line-field"><span class="field-k">Vuelo</span><span class="field-v mono-text" id="field-flight">—</span></div>
+                <div class="line-field"><span class="field-k">Asiento</span><span class="field-v mono-text" id="field-asiento">—</span></div>
+                <div class="line-field span-2"><span class="field-k">Pasajero</span><span class="field-v" id="field-nombre">—</span></div>
+                <div class="line-field"><span class="field-k">Edad</span><span class="field-v mono-text" id="field-edad">—</span></div>
+                <div class="line-field"><span class="field-k">Documento</span><span class="field-v mono-text" id="field-documento">—</span></div>
+                <div class="line-field span-4"><span class="field-k">Email</span><span class="field-v mono-text" id="field-email">—</span></div>
               </div>
 
-              <!-- Botones de Acción Línea a Línea -->
               <div class="stepper-actions">
                 <button type="button" class="btn btn-primary btn-step" id="btn-send-line" disabled>
                   <span class="btn-spinner" id="step-spinner" aria-hidden="true"></span>
                   <span class="btn-icon" id="step-btn-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <polyline points="9 18 15 12 9 6"/>
                     </svg>
                   </span>
                   <span class="btn-text" id="step-btn-text">Enviar y Siguiente Línea</span>
                 </button>
-                <button type="button" class="btn btn-outline" id="btn-reset-line-stepper" disabled>
-                  Reiniciar
-                </button>
+                <button type="button" class="btn btn-outline" id="btn-reset-line-stepper" disabled>Reiniciar</button>
               </div>
 
-              <!-- Registro de líneas procesadas con checkmarks -->
               <div class="line-log-container">
                 <div class="log-header">
-                  <span>HISTORIAL DE ENVÍOS LÍNEA A LÍNEA</span>
+                  <span>Historial de envíos</span>
                   <span id="log-count">0 procesadas</span>
                 </div>
                 <ul class="line-log-list" id="line-log-list">
@@ -218,25 +212,7 @@
               </div>
             </div>
 
-            <!-- Formato Requerido por el Backend -->
-            <div class="schema-spec-box">
-              <div class="spec-header-row">
-                <span class="spec-label">CABECERA CSV OBLIGATORIA (8 COLUMNAS)</span>
-                <span class="spec-tag mono-text">ESTRICTO</span>
-              </div>
-              <div class="schema-code-block mono-text">destino,origin,flightNumber,nombre,edad,documento,asiento,email</div>
-              <div class="schema-hint">
-                El archivo debe comenzar obligatoriamente con esta cabecera para que el backend pueda asociar la edad numérica y los datos de cada pasajero.
-              </div>
-            </div>
-
-            <!-- Especificación del Endpoint -->
-            <div class="endpoint-specs" id="endpoint-specs-box">
-              <span class="spec-label" id="spec-endpoint-label">ENDPOINT DESTINO (LOTE)</span>
-              <div class="spec-value mono-text" id="spec-endpoint-val"><span class="http-badge post">POST</span> /files/upload-csv &bull; multipart/form-data ("file")</div>
-            </div>
-
-            <!-- Mensaje de Respuesta / Estado -->
+            <!-- Feedback -->
             <div class="feedback-banner" id="upload-feedback" style="display: none;" role="status" aria-live="polite">
               <div class="feedback-icon" id="upload-feedback-icon"></div>
               <div class="feedback-content">
@@ -244,68 +220,79 @@
                 <div class="feedback-message" id="upload-feedback-msg">—</div>
               </div>
             </div>
+
+            <!-- Especificación -->
+            <div class="schema-spec-box">
+              <div class="spec-header-row">
+                <span class="spec-label">Cabecera obligatoria · 8 columnas</span>
+                <span class="spec-tag">Estricto</span>
+              </div>
+              <div class="schema-code-block mono-text">destino,origin,flightNumber,nombre,edad,documento,asiento,email</div>
+              <div class="schema-hint">El archivo debe comenzar con esta cabecera exacta para que el sistema pueda asociar los datos de cada pasajero.</div>
+            </div>
+
+            <div class="endpoint-specs" id="endpoint-specs-box">
+              <span class="spec-label" id="spec-endpoint-label">ENDPOINT DESTINO (LOTE)</span>
+              <div class="spec-value mono-text" id="spec-endpoint-val"><span class="http-badge post">POST</span> /files/upload-csv &bull; multipart/form-data ("file")</div>
+            </div>
           </div>
         </section>
 
-
-        <!-- ================= PANEL 2: CONSULTOR DE RESERVAS (LOTE O LÍNEA A LÍNEA) ================= -->
+        <!-- ================= PANEL 2: CONSULTA ================= -->
         <section class="ops-panel" id="panel-consult" aria-labelledby="consult-heading">
           <div class="panel-header">
             <div class="panel-badge">02</div>
             <div class="panel-headings">
-              <h2 id="consult-heading" class="panel-title">Consultor de Reservas y Recuperación</h2>
-              <p class="panel-subtitle">Consultar reservas particionadas en lote o paso a paso línea a línea</p>
+              <h2 id="consult-heading" class="panel-title">Consulta y recuperación</h2>
+              <p class="panel-subtitle">Recuperar reservas particionadas en lote o registro a registro</p>
             </div>
           </div>
 
           <div class="panel-body">
-            <!-- Selector de Modalidad de Consulta -->
             <div class="upload-mode-selector" id="consult-mode-selector">
-              <span class="mode-label">MODALIDAD DE CONSULTA:</span>
-              <div class="mode-pills" role="radiogroup" aria-label="Modalidad de Consulta">
+              <span class="mode-label">Modalidad</span>
+              <div class="mode-pills" role="radiogroup" aria-label="Modalidad de consulta">
                 <button type="button" class="mode-pill active" id="pill-consult-batch" role="radio" aria-checked="true">
                   <span class="mode-pill-dot"></span>
-                  Lote Completo (GET /files/zip)
+                  Lote completo
                 </button>
                 <button type="button" class="mode-pill" id="pill-consult-line" role="radio" aria-checked="false">
                   <span class="mode-pill-dot"></span>
-                  Línea a Línea (GET /files/consult/line)
+                  Línea a línea
                 </button>
               </div>
             </div>
 
-            <!-- CONTENIDO CONSULTA EN LOTE (BATCH) -->
+            <!-- CONSULTA EN LOTE -->
             <div id="consult-batch-content">
-              <!-- Cuadro de Información Técnica -->
               <div class="consult-info-box">
                 <div class="info-row">
                   <div class="info-cell">
-                    <span class="info-label">ENDPOINT DESTINO</span>
-                    <span class="info-val mono-text"><span class="http-badge get">GET</span> /files/zip</span>
+                    <span class="info-label">Formato de entrega</span>
+                    <span class="info-val mono-text">Paquete ZIP</span>
                   </div>
                   <div class="info-cell">
-                    <span class="info-label">TIPO DE CONTENIDO</span>
-                    <span class="info-val mono-text">application/zip (binario)</span>
+                    <span class="info-label">Agrupación</span>
+                    <span class="info-val mono-text">Por país de destino</span>
                   </div>
                 </div>
                 <div class="info-row border-top">
                   <div class="info-cell full-width">
-                    <span class="info-label">REPOSITORIO DE DESTINOS</span>
+                    <span class="info-label">Repositorio</span>
                     <span class="info-val mono-text">uploads/reservas/{pais}/AirTortilla_{XX}_{YYYY}_{MM}_{DD}.csv</span>
                   </div>
                 </div>
               </div>
 
               <p class="consult-description">
-                Solicita el archivo ZIP al backend, procesa las particiones generadas y muestra cada archivo en tablas interactivas. También permite descargar el paquete comprimido original.
+                Recupera todas las particiones generadas y las presenta en la tabla de resultados inferior, agrupadas por archivo. El paquete original puede descargarse una vez consultado.
               </p>
 
-              <!-- Acciones de Consulta y Descarga en Lote -->
               <div class="actions-split">
                 <button type="button" class="btn btn-secondary" id="btn-consult">
                   <span class="btn-spinner" id="consult-spinner" aria-hidden="true"></span>
                   <span class="btn-icon" id="consult-btn-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <circle cx="11" cy="11" r="8"/>
                       <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                     </svg>
@@ -313,9 +300,9 @@
                   <span class="btn-text" id="consult-btn-text">Consultar Resultados en Lote</span>
                 </button>
 
-                <button type="button" class="btn btn-outline" id="btn-download-zip" disabled title="Descargar archivo ZIP binario devuelto por el servidor">
+                <button type="button" class="btn btn-outline" id="btn-download-zip" disabled title="Descargar el paquete ZIP devuelto por el servidor">
                   <span class="btn-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                       <polyline points="7 10 12 15 17 10"/>
                       <line x1="12" y1="15" x2="12" y2="3"/>
@@ -326,18 +313,17 @@
               </div>
             </div>
 
-            <!-- CONTENIDO CONSULTA LÍNEA A LÍNEA (LINE) -->
+            <!-- CONSULTA LÍNEA A LÍNEA -->
             <div id="consult-line-content" style="display: none;">
-              <!-- Selector de archivo a consultar -->
               <div class="consult-file-select-box">
                 <div class="file-select-header">
-                  <label for="consult-file-select" class="spec-label">ARCHIVO A CONSULTAR:</label>
-                  <button type="button" class="btn-refresh-files" id="btn-refresh-consult-files" title="Actualizar lista de archivos desde /files/consult/files">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <label for="consult-file-select" class="spec-label">Archivo a consultar</label>
+                  <button type="button" class="btn-refresh-files" id="btn-refresh-consult-files" title="Actualizar lista de archivos">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <polyline points="23 4 23 10 17 10"/>
                       <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
                     </svg>
-                    Actualizar Archivos
+                    Actualizar
                   </button>
                 </div>
                 <select id="consult-file-select" class="control-select full-select">
@@ -345,100 +331,75 @@
                 </select>
               </div>
 
-              <!-- Stepper y navegación de índice -->
               <div class="line-stepper-box">
                 <div class="stepper-header">
                   <div class="stepper-title-wrap">
-                    <span class="stepper-title">CONSULTA LÍNEA A LÍNEA</span>
+                    <span class="stepper-title">Ficha de reserva</span>
                     <span class="stepper-counter" id="consult-index-counter">Reserva 0 de 0</span>
                   </div>
                   <div class="stepper-status-pill" id="consult-status-pill">NO INICIALIZADO</div>
                 </div>
 
-                <!-- Preview de la línea devuelta -->
+                <!-- Tarjeta de embarque -->
+                <div class="pass-card">
+                  <div class="pass-route">
+                    <div class="pass-airport">
+                      <span class="field-k">Origen</span>
+                      <span class="pass-code" id="cfield-origin">—</span>
+                    </div>
+                    <div class="pass-path" aria-hidden="true">
+                      <span class="pass-line"></span>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg>
+                      <span class="pass-line"></span>
+                    </div>
+                    <div class="pass-airport align-right">
+                      <span class="field-k">Destino</span>
+                      <span class="pass-code" id="cfield-destino">—</span>
+                    </div>
+                  </div>
+                  <div class="line-fields-grid pass-grid" id="consult-fields-grid">
+                    <div class="line-field span-2"><span class="field-k">Pasajero</span><span class="field-v" id="cfield-nombre">—</span></div>
+                    <div class="line-field"><span class="field-k">Vuelo</span><span class="field-v mono-text" id="cfield-flight">—</span></div>
+                    <div class="line-field"><span class="field-k">Identificador</span><span class="field-v mono-text cell-id" id="cfield-id">—</span></div>
+                    <div class="line-field span-2"><span class="field-k">Email</span><span class="field-v mono-text" id="cfield-email">—</span></div>
+                    <div class="line-field"><span class="field-k">Edad</span><span class="field-v mono-text" id="cfield-edad">—</span></div>
+                    <div class="line-field"><span class="field-k">Documento / Asiento</span><span class="field-v mono-text" id="cfield-doc-seat">—</span></div>
+                    <div class="line-field span-4" id="cfield-loc-container"><span class="field-k">Localizador</span><span class="field-v mono-text" id="cfield-localizador">—</span></div>
+                  </div>
+                </div>
+
                 <div class="current-line-preview">
-                  <div class="preview-label">LÍNEA CSV RETORNADA (GET /files/consult/line):</div>
-                  <div class="preview-code mono-text" id="consult-line-raw">— Presione "Consultar Línea Actual" o "Siguiente" —</div>
+                  <div class="preview-label">Registro bruto</div>
+                  <div class="preview-code mono-text" id="consult-line-raw">— Pulse "Consultar línea" o "Siguiente" —</div>
                 </div>
 
-                <!-- Desglose de campos de la reserva consultada -->
-                <div class="line-fields-grid" id="consult-fields-grid">
-                  <div class="line-field">
-                    <span class="field-k">IDENTIFICADOR</span>
-                    <span class="field-v mono-text cell-id" id="cfield-id">—</span>
-                  </div>
-                  <div class="line-field">
-                    <span class="field-k">DESTINO</span>
-                    <span class="field-v mono-text" id="cfield-destino">—</span>
-                  </div>
-                  <div class="line-field">
-                    <span class="field-k">ORIGEN</span>
-                    <span class="field-v mono-text" id="cfield-origin">—</span>
-                  </div>
-                  <div class="line-field">
-                    <span class="field-k">VUELO</span>
-                    <span class="field-v mono-text" id="cfield-flight">—</span>
-                  </div>
-                  <div class="line-field">
-                    <span class="field-k">PASAJERO</span>
-                    <span class="field-v" id="cfield-nombre">—</span>
-                  </div>
-                  <div class="line-field">
-                    <span class="field-k">EMAIL</span>
-                    <span class="field-v mono-text" id="cfield-email">—</span>
-                  </div>
-                  <div class="line-field">
-                    <span class="field-k">EDAD</span>
-                    <span class="field-v mono-text" id="cfield-edad">—</span>
-                  </div>
-                  <div class="line-field">
-                    <span class="field-k">DOCUMENTO / ASIENTO</span>
-                    <span class="field-v mono-text" id="cfield-doc-seat">—</span>
-                  </div>
-                  <div class="line-field" id="cfield-loc-container">
-                    <span class="field-k">LOCALIZADOR</span>
-                    <span class="field-v mono-text" id="cfield-localizador">—</span>
-                  </div>
-                </div>
-
-                <!-- Banner de alerta de colisión en línea -->
                 <div class="collision-banner" id="consult-collision-banner" style="display: none;">
-                  <div class="collision-badge-tag">COLISIÓN DE PASAJERO DETECTADA</div>
-                  <div class="collision-text" id="consult-collision-text">Coincidencia de Nombre, Origen y Destino detectada. Se asignó localizador compartido.</div>
+                  <div class="collision-badge-tag">Colisión de pasajero</div>
+                  <div class="collision-text" id="consult-collision-text">Coincidencia de nombre, origen y destino detectada. Se asignó localizador compartido.</div>
                 </div>
 
-                <!-- Botones de Navegación de Línea -->
                 <div class="consult-stepper-actions">
                   <button type="button" class="btn btn-outline" id="btn-consult-prev" disabled>
-                    &larr; Anterior
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+                    Anterior
                   </button>
                   <button type="button" class="btn btn-secondary" id="btn-consult-current">
                     <span class="btn-spinner" id="consult-line-spinner" aria-hidden="true"></span>
                     <span class="btn-text" id="btn-consult-current-text">Consultar Línea</span>
                   </button>
                   <button type="button" class="btn btn-primary" id="btn-consult-next">
-                    Siguiente &rarr;
+                    Siguiente
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                   </button>
                 </div>
 
                 <div class="consult-reset-row">
-                  <button type="button" class="btn-text-action" id="btn-reset-consult-index">
-                    Reiniciar a Primera Reserva
-                  </button>
-                  <button type="button" class="btn-text-action" id="btn-reinit-consult">
-                    Reinicializar Listas Backend (POST /initialize)
-                  </button>
+                  <button type="button" class="btn-text-action" id="btn-reset-consult-index">Volver a la primera reserva</button>
+                  <button type="button" class="btn-text-action" id="btn-reinit-consult">Reinicializar listas</button>
                 </div>
               </div>
             </div>
 
-            <!-- Especificación del Endpoint de Consulta -->
-            <div class="endpoint-specs" id="consult-specs-box">
-              <span class="spec-label" id="consult-endpoint-label">ENDPOINT DESTINO (LOTE)</span>
-              <div class="spec-value mono-text" id="consult-endpoint-val"><span class="http-badge get">GET</span> /files/zip &bull; application/zip</div>
-            </div>
-
-            <!-- Mensaje de Estado / Feedback de Consulta -->
             <div class="feedback-banner" id="consult-feedback" style="display: none;" role="status" aria-live="polite">
               <div class="feedback-icon" id="consult-feedback-icon"></div>
               <div class="feedback-content">
@@ -446,22 +407,28 @@
                 <div class="feedback-message" id="consult-feedback-msg">—</div>
               </div>
             </div>
+
+            <div class="endpoint-specs" id="consult-specs-box">
+              <span class="spec-label" id="consult-endpoint-label">ENDPOINT DESTINO (LOTE)</span>
+              <div class="spec-value mono-text" id="consult-endpoint-val"><span class="http-badge get">GET</span> /files/zip &bull; application/zip</div>
+            </div>
           </div>
         </section>
-
       </div>
 
-      <!-- ================= SECCIÓN DE VISUALIZACIÓN EN PANTALLA ================= -->
+      <!-- ================= RESULTADOS ================= -->
       <section class="viewer-section" id="viewer-section" aria-labelledby="viewer-heading">
         <div class="viewer-header">
           <div class="viewer-title-group">
-            <h3 id="viewer-heading" class="viewer-title">Tabla de Consulta de Resultados en Lote</h3>
+            <div class="board-mark" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
+            </div>
+            <h3 id="viewer-heading" class="viewer-title">Panel de reservas particionadas</h3>
             <span class="viewer-badge" id="viewer-badge">SIN CONSULTAS REALIZADAS</span>
           </div>
           <div class="viewer-controls" id="viewer-controls" style="display: none;">
-            <!-- Filtro por Archivo de Destino -->
             <div class="control-group">
-              <label for="file-filter-select" class="control-label">FILTRAR POR ARCHIVO:</label>
+              <label for="file-filter-select" class="control-label">Filtrar</label>
               <select id="file-filter-select" class="control-select">
                 <option value="ALL">Todos los Archivos Particionados</option>
               </select>
@@ -469,39 +436,145 @@
           </div>
         </div>
 
-        <!-- Contenedor de Tablas Dinámicas -->
         <div class="viewer-body" id="viewer-body">
           <div class="viewer-empty-state" id="viewer-empty-state">
             <div class="empty-icon">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="8" y1="13" x2="16" y2="13"/>
-                <line x1="8" y1="17" x2="16" y2="17"/>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/>
               </svg>
             </div>
             <div class="empty-text">No hay datos de consulta cargados</div>
-            <div class="empty-subtext">Haga clic en "Consultar Resultados en Lote" para consultar el servidor y visualizar las reservas particionadas.</div>
+            <div class="empty-subtext">Pulse "Consultar Resultados en Lote" para recuperar y visualizar las reservas particionadas.</div>
           </div>
-
-          <!-- Contenedor donde se insertan las tablas separadas por nombre de archivo -->
           <div class="tables-container" id="tables-container" style="display: none;"></div>
         </div>
       </section>
-
     </main>
 
-    <!-- Pie de Página -->
     <footer class="app-footer">
       <div class="footer-left">
-        <span>AirTortilla Enterprise &bull; Plataforma de Reservas</span>
-        <span class="footer-bullet">&bull;</span>
-        <span>Versión 1.0.0</span>
+        <span>AirTortilla Enterprise</span>
+        <span class="footer-bullet">·</span>
+        <span>Plataforma de Reservas v1.0.0</span>
       </div>
       <div class="footer-right">
-        <span>Acceso Restringido &bull; Personal de Operaciones y Despacho Únicamente</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>Acceso restringido · Personal de operaciones y despacho</span>
       </div>
     </footer>
+  </div>
+
+  <!-- ================= MODAL: INICIO DE SESIÓN ================= -->
+  <div class="modal-backdrop" id="modal-login" style="display: none;">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="login-title">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <span class="modal-badge">Seguridad</span>
+          <h3 class="modal-title" id="login-title">Acceso de personal</h3>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-login" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-login" onsubmit="return false;">
+          <div class="form-group">
+            <label for="login-username">Usuario</label>
+            <input type="text" id="login-username" class="modal-input" placeholder="Identificador de empleado" autocomplete="username" required>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Contraseña</label>
+            <input type="password" id="login-password" class="modal-input" placeholder="••••••••" autocomplete="current-password" required>
+          </div>
+          <div class="quick-credentials">
+            <span class="quick-title">Cuenta de demostracion</span>
+            <div class="quick-buttons">
+              <button type="button" class="btn-quick-fill" id="btn-fill-admin">Administrador (admin)</button>
+            </div>
+          </div>
+          <div class="modal-error-msg" id="login-error-msg" style="display: none;"></div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" id="btn-cancel-login">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-login">Entrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ADMINISTRACIÓN ================= -->
+  <div class="modal-backdrop" id="modal-admin" style="display: none;">
+    <div class="modal-card modal-card-large" role="dialog" aria-modal="true" aria-labelledby="admin-title">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <span class="modal-badge admin-badge">Sysadmin</span>
+          <h3 class="modal-title" id="admin-title">Administración y auditoría</h3>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-admin" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-tabs">
+        <button type="button" class="tab-btn active" id="tab-btn-create-user">Alta de usuario</button>
+        <button type="button" class="tab-btn" id="tab-btn-users-list">Usuarios registrados</button>
+        <button type="button" class="tab-btn" id="tab-btn-audit">Trazabilidad</button>
+      </div>
+      <div class="modal-body">
+        <div id="tab-content-create-user" class="tab-content">
+          <form id="form-create-user" onsubmit="return false;">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="new-username">Nombre de usuario</label>
+                <input type="text" id="new-username" class="modal-input" placeholder="usuario.aeropuerto" required>
+              </div>
+              <div class="form-group">
+                <label for="new-email">Correo electrónico</label>
+                <input type="email" id="new-email" class="modal-input" placeholder="usuario@airtortilla.com">
+              </div>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="new-password">Contraseña</label>
+                <input type="password" id="new-password" class="modal-input" placeholder="••••••••" required>
+              </div>
+              <div class="form-group">
+                <label for="new-role">Rol</label>
+                <select id="new-role" class="modal-input">
+                  <option value="ROLE_EMPLOYEE">Empleado de operaciones</option>
+                  <option value="ROLE_ADMIN">Administrador de sistemas</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-feedback" id="create-user-feedback" style="display: none;"></div>
+            <div class="modal-actions">
+              <button type="submit" class="btn btn-primary" id="btn-submit-create-user">Crear usuario</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="tab-content-users-list" class="tab-content" style="display: none;">
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr><th>ID</th><th>Usuario</th><th>Email</th><th>Rol</th><th>Estado</th><th>Fecha de alta</th><th>Acción</th></tr>
+              </thead>
+              <tbody id="users-table-body">
+                <tr><td colspan="7">Cargando usuarios...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-content-audit" class="tab-content" style="display: none;">
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Fecha/Hora</th><th>Usuario</th><th>Acción</th><th>Entidad</th><th>Detalles</th></tr>
+              </thead>
+              <tbody id="audit-table-body">
+                <tr><td colspan="5">Cargando registros de auditoría...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
