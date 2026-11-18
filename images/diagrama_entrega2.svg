@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 1030" width="1040" height="1030" font-family="Inter, Segoe UI, system-ui, sans-serif">
+<defs><marker id="ah" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#CCCCCC"/></marker></defs>
+<rect width="1040" height="1030" fill="#1F1F1F"/>
+<text x="520.0" y="34" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">AirTortilla · Entrega 2 — Migración a BDD relacional, seguridad y auditoría</text>
+<rect x="40" y="56" width="960" height="58" rx="6" fill="#181818" stroke="#5A5A5A" stroke-width="1.5"/>
+<text x="52" y="78" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">Navegador (empleado / administrador)</text>
+<text x="52" y="98" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">index.html · app.js · style.css  —  pantalla de login, subida de CSV, consulta de reservas, panel de admin y logs de auditoría</text>
+<line x1="520" y1="114" x2="520" y2="172" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="530" y="147" font-size="11" font-weight="400" fill="#AAAAAA" text-anchor="start">HTTP :8080  ·  cookie de sesión JSESSIONID</text>
+<rect x="20" y="172" width="1000" height="770" rx="8" fill="#1F1F1F" stroke="#2496ED" stroke-width="1.5" stroke-dasharray="7 5"/>
+<rect x="20" y="172" width="1000" height="28" rx="8" fill="#2496ED" fill-opacity="0.12"/>
+<text x="34" y="191" font-size="12.5" font-weight="700" fill="#2496ED" text-anchor="start">docker compose up -d</text>
+<text x="1006" y="191" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="end">docker-compose.yml  ·  Dockerfile multi-stage (temurin)</text>
+<rect x="40" y="210" width="960" height="466" rx="8" fill="#1F1F1F" stroke="#CCCCCC" stroke-width="1.5"/>
+<rect x="40" y="210" width="960" height="28" rx="8" fill="#CCCCCC" fill-opacity="0.12"/>
+<text x="54" y="229" font-size="12.5" font-weight="700" fill="#CCCCCC" text-anchor="start">Contenedor airtortilla-app</text>
+<text x="986" y="229" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="end">imagen xvirr/airtortilla:latest  ·  Spring Boot  ·  puerto 8080</text>
+<rect x="60" y="250" width="920" height="64" rx="6" fill="#181818" stroke="#4C9AFF" stroke-width="1.5"/>
+<text x="72" y="272" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">Spring Security — SecurityConfig + CustomUserDetailsService</text>
+<rect x="942" y="258" width="30" height="18" rx="9" fill="#4C9AFF" fill-opacity="0.18" stroke="#4C9AFF"/>
+<text x="957.0" y="271" font-size="10.5" font-weight="700" fill="#4C9AFF" text-anchor="middle">US1</text>
+<text x="72" y="292" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">Sesión HTTP · contraseñas con BCrypt · roles ROLE_EMPLOYEE / ROLE_ADMIN · enabled=false no entra · sin sesión → 401</text>
+<line x1="167.5" y1="314" x2="167.5" y2="344" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="402.5" y1="314" x2="402.5" y2="344" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="637.5" y1="314" x2="637.5" y2="344" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="872.5" y1="314" x2="872.5" y2="344" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<rect x="60" y="344" width="215" height="92" rx="6" fill="#181818" stroke="#4C9AFF" stroke-width="1.5"/>
+<text x="72" y="366" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">AuthController</text>
+<rect x="237" y="352" width="30" height="18" rx="9" fill="#4C9AFF" fill-opacity="0.18" stroke="#4C9AFF"/>
+<text x="252.0" y="365" font-size="10.5" font-weight="700" fill="#4C9AFF" text-anchor="middle">US1</text>
+<text x="72" y="386" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">/api/auth</text>
+<text x="72" y="402" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">login · me · logout</text>
+<text x="72" y="418" font-size="11.5" font-weight="400" fill="#3FB950" text-anchor="start">↳ AUTH_LOGIN / AUTH_LOGOUT</text>
+<rect x="295" y="344" width="215" height="92" rx="6" fill="#181818" stroke="#E5A50A" stroke-width="1.5"/>
+<text x="307" y="366" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">AdminUserController</text>
+<rect x="472" y="352" width="30" height="18" rx="9" fill="#E5A50A" fill-opacity="0.18" stroke="#E5A50A"/>
+<text x="487.0" y="365" font-size="10.5" font-weight="700" fill="#E5A50A" text-anchor="middle">US2</text>
+<text x="307" y="386" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">/api/admin/users</text>
+<text x="307" y="402" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">@PreAuthorize(ADMIN)</text>
+<text x="307" y="418" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">GET · POST · PATCH {id}/status</text>
+<rect x="530" y="344" width="215" height="92" rx="6" fill="#181818" stroke="#A371F7" stroke-width="1.5"/>
+<text x="542" y="366" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">CsvController</text>
+<text x="542" y="386" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">/files</text>
+<text x="542" y="402" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">upload · upload-line · zip</text>
+<text x="542" y="418" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">db/reservas · all · consult-file</text>
+<rect x="765" y="344" width="215" height="92" rx="6" fill="#181818" stroke="#3FB950" stroke-width="1.5"/>
+<text x="777" y="366" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">AuditLogController</text>
+<rect x="942" y="352" width="30" height="18" rx="9" fill="#3FB950" fill-opacity="0.18" stroke="#3FB950"/>
+<text x="957.0" y="365" font-size="10.5" font-weight="700" fill="#3FB950" text-anchor="middle">US3</text>
+<text x="777" y="386" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">/api/audit-logs</text>
+<text x="777" y="402" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">paginado (page, size)</text>
+<text x="777" y="418" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">filtro por user / action</text>
+<line x1="402.5" y1="436" x2="402.5" y2="466" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="637.5" y1="436" x2="637.5" y2="466" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="872.5" y1="436" x2="872.5" y2="466" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<rect x="60" y="466" width="215" height="104" rx="6" fill="#181818" stroke="#E5A50A" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="72" y="488" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">DataInitializer</text>
+<text x="72" y="508" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">Seeder al arrancar:</text>
+<text x="72" y="524" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">si no hay usuarios crea</text>
+<text x="72" y="540" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">admin / admin123 (ADMIN)</text>
+<rect x="295" y="466" width="215" height="104" rx="6" fill="#181818" stroke="#E5A50A" stroke-width="1.5"/>
+<text x="307" y="488" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">UserService</text>
+<rect x="472" y="474" width="30" height="18" rx="9" fill="#E5A50A" fill-opacity="0.18" stroke="#E5A50A"/>
+<text x="487.0" y="487" font-size="10.5" font-weight="700" fill="#E5A50A" text-anchor="middle">US2</text>
+<text x="307" y="508" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">Alta de empleados/admins</text>
+<text x="307" y="524" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">Bloquear / desbloquear</text>
+<text x="307" y="540" font-size="11.5" font-weight="400" fill="#3FB950" text-anchor="start">↳ USER_CREATED</text>
+<text x="307" y="556" font-size="11.5" font-weight="400" fill="#3FB950" text-anchor="start">↳ USER_STATUS_TOGGLED</text>
+<rect x="530" y="466" width="215" height="104" rx="6" fill="#181818" stroke="#A371F7" stroke-width="1.5"/>
+<text x="542" y="488" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">ReservaDatabaseService</text>
+<text x="542" y="508" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">CsvService: lectura en memoria</text>
+<text x="542" y="524" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">AT-XXXX · colisiones LOC-XXXX</text>
+<text x="542" y="540" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">ZipService: ZIP al vuelo</text>
+<text x="542" y="556" font-size="11.5" font-weight="400" fill="#3FB950" text-anchor="start">↳ RESERVA_CREATED / COLLISION_…</text>
+<rect x="765" y="466" width="215" height="104" rx="6" fill="#181818" stroke="#3FB950" stroke-width="1.5"/>
+<text x="777" y="488" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">AuditService</text>
+<rect x="942" y="474" width="30" height="18" rx="9" fill="#3FB950" fill-opacity="0.18" stroke="#3FB950"/>
+<text x="957.0" y="487" font-size="10.5" font-weight="700" fill="#3FB950" text-anchor="middle">US3</text>
+<text x="777" y="508" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">logAction(...): usuario del</text>
+<text x="777" y="524" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">SecurityContextHolder, IP,</text>
+<text x="777" y="540" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">timestamp y detalles</text>
+<line x1="167.5" y1="570" x2="167.5" y2="600" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="402.5" y1="570" x2="402.5" y2="600" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="637.5" y1="570" x2="637.5" y2="600" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="872.5" y1="570" x2="872.5" y2="600" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<rect x="60" y="600" width="920" height="58" rx="6" fill="#181818" stroke="#A371F7" stroke-width="1.5"/>
+<text x="72" y="622" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">Spring Data JPA + Hibernate (ORM)</text>
+<text x="72" y="642" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">PersonRepository · ReservaRepository · UserRepository · AuditLogRepository  —  consultas parametrizadas, sin SQL a mano</text>
+<line x1="520" y1="658" x2="520" y2="716" stroke="#CCCCCC" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="530" y="686" font-size="11" font-weight="400" fill="#AAAAAA" text-anchor="start">JDBC  ·  jdbc:postgresql://postgres:5432/airtortilla</text>
+<text x="988" y="700" font-size="11" font-weight="400" fill="#AAAAAA" text-anchor="end">depends_on: postgres (service_healthy)</text>
+<rect x="40" y="716" width="960" height="210" rx="8" fill="#1F1F1F" stroke="#A371F7" stroke-width="1.5"/>
+<rect x="40" y="716" width="960" height="28" rx="8" fill="#A371F7" fill-opacity="0.12"/>
+<text x="54" y="735" font-size="12.5" font-weight="700" fill="#A371F7" text-anchor="start">Contenedor airtortilla-postgres</text>
+<text x="986" y="735" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="end">postgres:16-alpine  ·  puerto 5432  ·  healthcheck pg_isready  ·  volumen postgres_data</text>
+<rect x="60" y="754" width="215" height="158" rx="6" fill="#181818" stroke="#A371F7" stroke-width="1.5"/>
+<text x="72" y="776" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">persons</text>
+<text x="72" y="796" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">PK id</text>
+<text x="72" y="812" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">UQ documento (DNI/Pas.)</text>
+<text x="72" y="828" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">nombre · email</text>
+<text x="72" y="844" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">edad · asiento</text>
+<rect x="295" y="754" width="215" height="158" rx="6" fill="#181818" stroke="#A371F7" stroke-width="1.5"/>
+<text x="307" y="776" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">reservas</text>
+<text x="307" y="796" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">PK id</text>
+<text x="307" y="812" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">FK passenger_id → persons</text>
+<text x="307" y="828" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">UQ identifier (AT-XXXX)</text>
+<text x="307" y="844" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">localizador (LOC-XXXX)</text>
+<text x="307" y="860" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">destino · origin</text>
+<text x="307" y="876" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">flight_number · created_at</text>
+<rect x="530" y="754" width="215" height="158" rx="6" fill="#181818" stroke="#E5A50A" stroke-width="1.5"/>
+<text x="542" y="776" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">app_users</text>
+<rect x="707" y="762" width="30" height="18" rx="9" fill="#E5A50A" fill-opacity="0.18" stroke="#E5A50A"/>
+<text x="722.0" y="775" font-size="10.5" font-weight="700" fill="#E5A50A" text-anchor="middle">US2</text>
+<text x="542" y="796" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">PK id</text>
+<text x="542" y="812" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">UQ username · UQ email</text>
+<text x="542" y="828" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">password (hash BCrypt)</text>
+<text x="542" y="844" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">role · enabled</text>
+<text x="542" y="860" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">created_at</text>
+<rect x="765" y="754" width="215" height="158" rx="6" fill="#181818" stroke="#3FB950" stroke-width="1.5"/>
+<text x="777" y="776" font-size="13" font-weight="600" fill="#EEEEEE" text-anchor="start">audit_logs</text>
+<rect x="942" y="762" width="30" height="18" rx="9" fill="#3FB950" fill-opacity="0.18" stroke="#3FB950"/>
+<text x="957.0" y="775" font-size="10.5" font-weight="700" fill="#3FB950" text-anchor="middle">US3</text>
+<text x="777" y="796" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">PK id · timestamp</text>
+<text x="777" y="812" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">username · action</text>
+<text x="777" y="828" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">entity_type · entity_id</text>
+<text x="777" y="844" font-size="11.5" font-weight="400" fill="#AAAAAA" text-anchor="start">details · ip_address</text>
+<line x1="295" y1="800" x2="277" y2="800" stroke="#A371F7" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="285" y="790" font-size="10.5" font-weight="700" fill="#A371F7" text-anchor="middle">N:1</text>
+<rect x="40" y="964" width="14" height="14" rx="3" fill="#4C9AFF" fill-opacity="0.25" stroke="#4C9AFF"/>
+<text x="60" y="975" font-size="11.5" font-weight="400" fill="#CCCCCC" text-anchor="start">US1 · Login de empleados</text>
+<rect x="196.39999999999998" y="964" width="14" height="14" rx="3" fill="#E5A50A" fill-opacity="0.25" stroke="#E5A50A"/>
+<text x="216.39999999999998" y="975" font-size="11.5" font-weight="400" fill="#CCCCCC" text-anchor="start">US2 · Alta de usuarios (admin)</text>
+<rect x="386.4" y="964" width="14" height="14" rx="3" fill="#3FB950" fill-opacity="0.25" stroke="#3FB950"/>
+<text x="406.4" y="975" font-size="11.5" font-weight="400" fill="#CCCCCC" text-anchor="start">US3 · Trazabilidad / auditoría</text>
+<rect x="576.4" y="964" width="14" height="14" rx="3" fill="#A371F7" fill-opacity="0.25" stroke="#A371F7"/>
+<text x="596.4" y="975" font-size="11.5" font-weight="400" fill="#CCCCCC" text-anchor="start">Datos en PostgreSQL (antes CSV en disco)</text>
+<rect x="822.4" y="964" width="14" height="14" rx="3" fill="#2496ED" fill-opacity="0.25" stroke="#2496ED"/>
+<text x="842.4" y="975" font-size="11.5" font-weight="400" fill="#CCCCCC" text-anchor="start">Contenedores Docker</text>
+<text x="40" y="1001" font-size="11" font-weight="400" fill="#3FB950" text-anchor="start">↳ en verde: la acción que cada componente registra en audit_logs a través de AuditService</text>
+</svg>

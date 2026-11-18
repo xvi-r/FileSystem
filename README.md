@@ -6,9 +6,9 @@ Proyecto desarrollado en **Java con Spring Boot** e interfaz web para el procesa
 
 ---
 
-## Diagrama del Sistema
+## Diagrama del Sistema (Entrega 2)
 
-[![Diagrama Base del Sistema](images/diagrama_base.svg)](images/diagrama_base.svg)
+[![Diagrama de la Entrega 2](images/diagrama_entrega2.svg)](images/diagrama_entrega2.svg)
 
 ---
 
@@ -256,10 +256,11 @@ FileSystem/
 
 ## Tests Automatizados
 
-Hemos incluido 2 tests basicos con JUnit 5 y base de datos H2 en memoria para verificar la logica principal sin necesidad de tener PostgreSQL corriendo:
+Hemos incluido 3 tests basicos con JUnit 5 y base de datos H2 en memoria para verificar la logica principal sin necesidad de tener PostgreSQL corriendo:
 
 1. **`ReservaCollisionTest`**: Comprueba que al meter dos reservas con el mismo Nombre, Origen y Destino el sistema detecta la colision automaticamente y les asigna el mismo codigo localizador compartido `LOC-0001`, dejando la primera sin localizador hasta que llega la segunda.
 2. **`TraceabilityAuditTest`**: Comprueba que el servicio de auditoria registra correctamente las operaciones en la tabla `audit_logs` guardando el usuario, la accion, la entidad y la fecha.
+3. **`UserCreationTest`**: Comprueba que el servicio de usuarios registra correctamente nuevos empleados con su rol (`ROLE_EMPLOYEE`) y su estado habilitado por defecto.
 
 Para ejecutar los tests desde la consola:
 ```bash
