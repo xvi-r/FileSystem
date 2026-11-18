@@ -277,6 +277,8 @@ Para ejecutar los tests desde la consola:
 
 ### Opción 1: Con Docker Compose (La forma recomendada)
 
+Puedes descargar el Compose ya hecho en los releases, simplemente descarga el compose y lanza lo con docker compose up
+
 Teniendo Docker Desktop arrancado en tu ordenador, solo tienes que situarte en la carpeta del proyecto y ejecutar:
 
 ```bash
