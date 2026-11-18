@@ -256,6 +256,11 @@ FileSystem/
 
 ## Cómo ejecutar el proyecto
 
+> ### Credenciales de Acceso por Defecto (SysAdmin)
+> - **Usuario**: `admin`
+> - **Contraseña**: `admin123`
+> *(Al arrancar la app por primera vez, un seeder genera esta cuenta automaticamente en la base de datos para poder iniciar sesion de inmediato y probar todas las funciones de administracion, subida de archivos y auditoria).*
+
 ### Opción 1: Con Docker Compose (La forma recomendada)
 
 Teniendo Docker Desktop arrancado en tu ordenador, solo tienes que situarte en la carpeta del proyecto y ejecutar:
@@ -268,6 +273,7 @@ Esto se encarga de todo automáticamente:
 1. Descarga y arranca el contenedor de **PostgreSQL 16** con su volumen para no perder datos.
 2. Descarga la imagen oficial desde Docker Hub [`xvirr/airtortilla:latest`](https://hub.docker.com/r/xvirr/airtortilla) (o la compila con el `Dockerfile` local si usas `--build`).
 3. Espera a que PostgreSQL esté listo con un healthcheck y luego arranca la aplicación en el puerto `8080`.
+4. Abre en tu navegador: [http://localhost:8080](http://localhost:8080)
 
 Para pararlo cuando termines:
 ```bash
