@@ -84,7 +84,7 @@ public class CsvController {
                 .body(zipBytes);
     }
 
-    @GetMapping({"/all", "/consult/files"})
+    @GetMapping({"/all", "/consult/files", "/files"})
     public Map<String, Integer> getAll() {
         return csvService.getAllCsvNames();
     }
@@ -95,7 +95,7 @@ public class CsvController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = {"/consult-files", "/consult/line/initialize"}, method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = {"/consult-files", "/consult/line/initialize", "/consult/initialize"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<String> initializeConsultation() {
         csvService.initLineByLineReading();
         return ResponseEntity.ok("database consultation initialized");
