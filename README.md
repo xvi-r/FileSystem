@@ -247,9 +247,23 @@ FileSystem/
 │   │       ├── application.properties # Conexion a postgres y configuracion de jpa
 │   │       ├── csv/                   # reservasAir.csv de ejemplo
 │   │       └── static/                # Frontend web (index.html, app.js, style.css)
-│   └── test/                          # DemoApplicationTests
+│   └── test/                          # ReservaCollisionTest, TraceabilityAuditTest, DemoApplicationTests
 └── images/
     └── diagrama_base.svg         # Diagrama de arquitectura
+```
+
+---
+
+## Tests Automatizados
+
+Hemos incluido 2 tests basicos con JUnit 5 y base de datos H2 en memoria para verificar la logica principal sin necesidad de tener PostgreSQL corriendo:
+
+1. **`ReservaCollisionTest`**: Comprueba que al meter dos reservas con el mismo Nombre, Origen y Destino el sistema detecta la colision automaticamente y les asigna el mismo codigo localizador compartido `LOC-0001`, dejando la primera sin localizador hasta que llega la segunda.
+2. **`TraceabilityAuditTest`**: Comprueba que el servicio de auditoria registra correctamente las operaciones en la tabla `audit_logs` guardando el usuario, la accion, la entidad y la fecha.
+
+Para ejecutar los tests desde la consola:
+```bash
+./mvnw test
 ```
 
 ---
