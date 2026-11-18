@@ -24,6 +24,11 @@
     CONSULT_FILES: '/files/consult/files',
     CONSULT_INITIALIZE: '/files/consult/line/initialize',
     CONSULT_LINE: '/files/consult/line',
+    AUTH_LOGIN: '/api/auth/login',
+    AUTH_ME: '/api/auth/me',
+    AUTH_LOGOUT: '/api/auth/logout',
+    ADMIN_USERS: '/api/admin/users',
+    ADMIN_AUDIT: '/api/admin/audit-logs',
   };
 
   // Gestión de estado de la interfaz
@@ -1374,5 +1379,275 @@
     document.body.removeChild(downloadLink);
     window.URL.revokeObjectURL(downloadUrl);
   });
+
+  // ==========================================================================
+  // AUTENTICACIÓN Y GESTIÓN DE ADMINISTRADOR (Entrega 2)
+  // ==========================================================================
+  let currentUser = null;
+
+  const btnOpenLogin = document.getElementById('btn-open-login');
+  const authUserBox = document.getElementById('auth-user-box');
+  const authUserRole = document.getElementById('auth-user-role');
+  const authUserName = document.getElementById('auth-user-name');
+  const btnOpenAdmin = document.getElementById('btn-open-admin');
+  const btnLogout = document.getElementById('btn-logout');
+
+  const modalLogin = document.getElementById('modal-login');
+  const btnCloseLogin = document.getElementById('btn-close-login');
+  const btnCancelLogin = document.getElementById('btn-cancel-login');
+  const formLogin = document.getElementById('form-login');
+  const loginUsernameInput = document.getElementById('login-username');
+  const loginPasswordInput = document.getElementById('login-password');
+  const loginErrorMsg = document.getElementById('login-error-msg');
+  const btnFillAdmin = document.getElementById('btn-fill-admin');
+  const btnFillEmployee = document.getElementById('btn-fill-employee');
+
+  const modalAdmin = document.getElementById('modal-admin');
+  const btnCloseAdmin = document.getElementById('btn-close-admin');
+  const tabBtnCreateUser = document.getElementById('tab-btn-create-user');
+  const tabBtnUsersList = document.getElementById('tab-btn-users-list');
+  const tabBtnAudit = document.getElementById('tab-btn-audit');
+  const tabContentCreateUser = document.getElementById('tab-content-create-user');
+  const tabContentUsersList = document.getElementById('tab-content-users-list');
+  const tabContentAudit = document.getElementById('tab-content-audit');
+
+  const formCreateUser = document.getElementById('form-create-user');
+  const newUsernameInput = document.getElementById('new-username');
+  const newEmailInput = document.getElementById('new-email');
+  const newPasswordInput = document.getElementById('new-password');
+  const newRoleSelect = document.getElementById('new-role');
+  const createUserFeedback = document.getElementById('create-user-feedback');
+  const usersTableBody = document.getElementById('users-table-body');
+  const auditTableBody = document.getElementById('audit-table-body');
+
+  function updateAuthUI(user) {
+    currentUser = user;
+    if (user) {
+      btnOpenLogin.style.display = 'none';
+      authUserBox.style.display = 'flex';
+      authUserName.textContent = user.username;
+      authUserRole.textContent = user.role === 'ROLE_ADMIN' ? 'SYSADMIN' : 'EMPLEADO';
+      authUserRole.className = 'auth-role-badge ' + (user.role === 'ROLE_ADMIN' ? 'admin-badge' : '');
+      btnOpenAdmin.style.display = user.role === 'ROLE_ADMIN' ? 'inline-block' : 'none';
+    } else {
+      btnOpenLogin.style.display = 'inline-flex';
+      authUserBox.style.display = 'none';
+      btnOpenAdmin.style.display = 'none';
+    }
+  }
+
+  async function checkCurrentSession() {
+    try {
+      const res = await fetch(API_ENDPOINTS.AUTH_ME);
+      if (res.ok) {
+        const user = await res.json();
+        updateAuthUI(user);
+      } else {
+        updateAuthUI(null);
+      }
+    } catch {
+      updateAuthUI(null);
+    }
+  }
+
+  // Comprobar sesión al cargar la página
+  checkCurrentSession();
+
+  // Abrir / Cerrar modal de login
+  btnOpenLogin.addEventListener('click', () => {
+    loginErrorMsg.style.display = 'none';
+    modalLogin.style.display = 'flex';
+    loginUsernameInput.focus();
+  });
+
+  const closeLoginModal = () => { modalLogin.style.display = 'none'; };
+  btnCloseLogin.addEventListener('click', closeLoginModal);
+  btnCancelLogin.addEventListener('click', closeLoginModal);
+
+  // Relleno rápido
+  if (btnFillAdmin) {
+    btnFillAdmin.addEventListener('click', () => {
+      loginUsernameInput.value = 'admin';
+      loginPasswordInput.value = 'admin123';
+    });
+  }
+  if (btnFillEmployee) {
+    btnFillEmployee.addEventListener('click', () => {
+      loginUsernameInput.value = 'empleado';
+      loginPasswordInput.value = 'empleado123';
+    });
+  }
+
+  // Enviar formulario de login
+  formLogin.addEventListener('submit', async () => {
+    loginErrorMsg.style.display = 'none';
+    const username = loginUsernameInput.value.trim();
+    const password = loginPasswordInput.value.trim();
+
+    try {
+      const res = await fetch(API_ENDPOINTS.AUTH_LOGIN, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (res.ok) {
+        const user = await res.json();
+        updateAuthUI(user);
+        closeLoginModal();
+        loginPasswordInput.value = '';
+      } else {
+        const err = await res.json().catch(() => ({}));
+        loginErrorMsg.textContent = err.error || 'Credenciales incorrectas o cuenta inactiva';
+        loginErrorMsg.style.display = 'block';
+      }
+    } catch {
+      loginErrorMsg.textContent = 'Error de conexión con el servidor';
+      loginErrorMsg.style.display = 'block';
+    }
+  });
+
+  // Cerrar sesión
+  btnLogout.addEventListener('click', async () => {
+    try {
+      await fetch(API_ENDPOINTS.AUTH_LOGOUT, { method: 'POST' });
+    } finally {
+      updateAuthUI(null);
+    }
+  });
+
+  // Modal de Administrador
+  btnOpenAdmin.addEventListener('click', () => {
+    modalAdmin.style.display = 'flex';
+    switchAdminTab('create-user');
+  });
+
+  btnCloseAdmin.addEventListener('click', () => {
+    modalAdmin.style.display = 'none';
+  });
+
+  function switchAdminTab(tab) {
+    [tabBtnCreateUser, tabBtnUsersList, tabBtnAudit].forEach(b => b.classList.remove('active'));
+    [tabContentCreateUser, tabContentUsersList, tabContentAudit].forEach(c => c.style.display = 'none');
+
+    if (tab === 'create-user') {
+      tabBtnCreateUser.classList.add('active');
+      tabContentCreateUser.style.display = 'block';
+    } else if (tab === 'users-list') {
+      tabBtnUsersList.classList.add('active');
+      tabContentUsersList.style.display = 'block';
+      loadUsersList();
+    } else if (tab === 'audit') {
+      tabBtnAudit.classList.add('active');
+      tabContentAudit.style.display = 'block';
+      loadAuditLogs();
+    }
+  }
+
+  tabBtnCreateUser.addEventListener('click', () => switchAdminTab('create-user'));
+  tabBtnUsersList.addEventListener('click', () => switchAdminTab('users-list'));
+  tabBtnAudit.addEventListener('click', () => switchAdminTab('audit'));
+
+  // Dar de alta usuario (Admin)
+  formCreateUser.addEventListener('submit', async () => {
+    createUserFeedback.style.display = 'none';
+    const payload = {
+      username: newUsernameInput.value.trim(),
+      email: newEmailInput.value.trim(),
+      password: newPasswordInput.value.trim(),
+      role: newRoleSelect.value
+    };
+
+    try {
+      const res = await fetch(API_ENDPOINTS.ADMIN_USERS, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        const created = await res.json();
+        createUserFeedback.textContent = `¡Usuario "${created.username}" creado con éxito con rol ${created.role}!`;
+        createUserFeedback.className = 'modal-feedback success';
+        createUserFeedback.style.display = 'block';
+        formCreateUser.reset();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        createUserFeedback.textContent = err.error || 'Error al crear usuario';
+        createUserFeedback.className = 'modal-feedback error';
+        createUserFeedback.style.display = 'block';
+      }
+    } catch {
+      createUserFeedback.textContent = 'Error de conexión con el servidor';
+      createUserFeedback.className = 'modal-feedback error';
+      createUserFeedback.style.display = 'block';
+    }
+  });
+
+  // Cargar lista de usuarios
+  async function loadUsersList() {
+    usersTableBody.innerHTML = '<tr><td colspan="7">Cargando usuarios...</td></tr>';
+    try {
+      const res = await fetch(API_ENDPOINTS.ADMIN_USERS);
+      if (!res.ok) throw new Error();
+      const users = await res.json();
+      if (!users.length) {
+        usersTableBody.innerHTML = '<tr><td colspan="7">No hay usuarios registrados.</td></tr>';
+        return;
+      }
+      usersTableBody.innerHTML = users.map(u => `
+        <tr>
+          <td>${u.id}</td>
+          <td><strong>${u.username}</strong></td>
+          <td>${u.email || '—'}</td>
+          <td><span class="auth-role-badge ${u.role === 'ROLE_ADMIN' ? 'admin-badge' : ''}">${u.role}</span></td>
+          <td>${u.enabled ? '<span style="color:var(--status-success-text)">Activo</span>' : '<span style="color:var(--status-error-text)">Inactivo</span>'}</td>
+          <td>${u.createdAt ? u.createdAt.replace('T', ' ').substring(0, 19) : '—'}</td>
+          <td>
+            <button type="button" class="btn-table-action" onclick="window.toggleUser(${u.id})">
+              ${u.enabled ? 'Desactivar' : 'Activar'}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    } catch {
+      usersTableBody.innerHTML = '<tr><td colspan="7" style="color:var(--status-error-text)">Error al cargar usuarios</td></tr>';
+    }
+  }
+
+  window.toggleUser = async function(id) {
+    try {
+      const res = await fetch(`${API_ENDPOINTS.ADMIN_USERS}/${id}/toggle-status`, { method: 'PATCH' });
+      if (res.ok) loadUsersList();
+    } catch {
+      alert('Error al modificar estado del usuario');
+    }
+  };
+
+  // Cargar registros de auditoría
+  async function loadAuditLogs() {
+    auditTableBody.innerHTML = '<tr><td colspan="5">Cargando auditoría...</td></tr>';
+    try {
+      const res = await fetch(`${API_ENDPOINTS.ADMIN_AUDIT}?page=0&size=50`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const logs = data.content || data;
+      if (!logs.length) {
+        auditTableBody.innerHTML = '<tr><td colspan="5">No hay registros de auditoría aún.</td></tr>';
+        return;
+      }
+      auditTableBody.innerHTML = logs.map(l => `
+        <tr>
+          <td style="font-family:'JetBrains Mono', monospace; font-size:11px;">${l.timestamp ? l.timestamp.replace('T', ' ').substring(0, 19) : '—'}</td>
+          <td><strong>${l.username}</strong></td>
+          <td><span class="modal-badge">${l.action}</span></td>
+          <td>${l.entityType ? `${l.entityType}:${l.entityId || ''}` : '—'}</td>
+          <td style="font-size:11px;">${l.details || ''}</td>
+        </tr>
+      `).join('');
+    } catch {
+      auditTableBody.innerHTML = '<tr><td colspan="5" style="color:var(--status-error-text)">Error al cargar auditoría</td></tr>';
+    }
+  }
 
 })();
