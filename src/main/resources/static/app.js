@@ -18,12 +18,12 @@
 
   // Endpoints definidos en CsvController de Spring Boot (/files)
   const API_ENDPOINTS = {
-    UPLOAD: '/files/upload-csv',
-    LINE: '/files/line',
+    UPLOAD: '/files/upload',
+    LINE: '/files/upload-line',
     ZIP: '/files/zip',
-    CONSULT_FILES: '/files/consult/files',
-    CONSULT_INITIALIZE: '/files/consult/line/initialize',
-    CONSULT_LINE: '/files/consult/line',
+    CONSULT_FILES: '/files/consult-files',
+    CONSULT_INITIALIZE: '/files/consult-files',
+    CONSULT_LINE: '/files/consult-file',
     AUTH_LOGIN: '/api/auth/login',
     AUTH_ME: '/api/auth/me',
     AUTH_LOGOUT: '/api/auth/logout',
@@ -198,7 +198,7 @@
       lineStepperBox.style.display = 'none';
 
       specEndpointLabel.textContent = 'ENDPOINT DESTINO (LOTE)';
-      specEndpointVal.innerHTML = '<span class="http-badge post">POST</span> /files/upload-csv &bull; multipart/form-data ("file")';
+      specEndpointVal.innerHTML = '<span class="http-badge post">POST</span> /files/upload &bull; multipart/form-data ("file")';
     } else {
       pillModeLine.classList.add('active');
       pillModeLine.setAttribute('aria-checked', 'true');
@@ -209,7 +209,7 @@
       lineStepperBox.style.display = 'flex';
 
       specEndpointLabel.textContent = 'ENDPOINT DESTINO (LÍNEA A LÍNEA)';
-      specEndpointVal.innerHTML = '<span class="http-badge post">POST</span> /files/line &bull; text/csv (Cuerpo de una sola línea)';
+      specEndpointVal.innerHTML = '<span class="http-badge post">POST</span> /files/upload-line &bull; text/csv (Cuerpo de una sola línea)';
       updateLineStepperUI();
     }
   }

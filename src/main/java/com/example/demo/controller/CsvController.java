@@ -58,13 +58,13 @@ public class CsvController {
     }
 
     //subida de csv multipart para procesar y meter en la bdd
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = {"/upload", "/upload-csv"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadCsv(@RequestParam("file") MultipartFile file) throws IOException {
         int count = csvService.processUploadedCsv(file);
         return ResponseEntity.ok("imported " + count + " reservations into database successfully");
     }
 
-    @PostMapping("/process")
+    @PostMapping({"/process", "/process-csv"})
     public ResponseEntity<String> processCsv() throws IOException {
         csvService.processCsv();
         return ResponseEntity.ok("csv processed successfully");
@@ -84,24 +84,24 @@ public class CsvController {
                 .body(zipBytes);
     }
 
-    @GetMapping("/all")
+    @GetMapping({"/all", "/consult/files"})
     public Map<String, Integer> getAll() {
         return csvService.getAllCsvNames();
     }
 
-    @PostMapping("/upload-line")
+    @PostMapping({"/upload-line", "/line"})
     public ResponseEntity<Void> uploadLine(@RequestBody String csv) throws IOException {
         csvService.processLine(csv);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/consult-files")
+    @RequestMapping(value = {"/consult-files", "/consult/line/initialize"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<String> initializeConsultation() {
         csvService.initLineByLineReading();
         return ResponseEntity.ok("database consultation initialized");
     }
 
-    @GetMapping("/consult-file")
+    @GetMapping({"/consult-file", "/consult/line"})
     public ResponseEntity<String> consultLine(
             @RequestParam(name = "file", required = false, defaultValue = "all") String csvFile,
             @RequestParam(name = "index", required = false, defaultValue = "0") int index
